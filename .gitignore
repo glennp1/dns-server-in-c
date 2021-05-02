@@ -1,0 +1,11 @@
+# Directory Structure Files
+.DS_Store
+
+# CLion Files
+.idea/
+
+# Main executable file
+allocate
+
+# Other executable files
+*.o
