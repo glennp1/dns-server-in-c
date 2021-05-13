@@ -5,7 +5,11 @@
 .idea/
 
 # Main executable file
-allocate
+dns_svr
+phase1
 
 # Other executable files
 *.o
+
+# Log file
+dns_svr.log
