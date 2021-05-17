@@ -14,7 +14,7 @@ EXE = phase1 # todo Change this to dns_svr after done testing phase 1
 OBJ =
 LOG = dns_svr.log
 
-# Running "make" with no argument will make the first target in the file
+# Handles "$ make" and "$ make all"
 all: main.c $(OBJ)
 	$(CC) -o $(EXE) main.c $(OBJ) $(CFLAGS)
 
