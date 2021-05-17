@@ -66,10 +66,12 @@ int main(int argc, char *argv[]) {
     // leave a line blank
     printf("\n");
 
-    // convert this last byte into bits and display this
+    // convert this last byte into bits
     unsigned char *bits = one_byte_to_bits(first_byte);
+
+    // print each bit
     for (int i = 0; i < 8; i++) {
-        printf("%d\n", *(bits + i));
+        printf("%d\n", *(bits+i));
     }
 
     // display the formatted time, this is a test
@@ -88,17 +90,35 @@ int two_bytes_to_integer(unsigned char first_byte, unsigned char second_byte) {
 }
 
 // Reads in one bytes from standard input and returns them as an array of 8 bits
-unsigned char *one_byte_to_bits(unsigned char first_byte) {
+unsigned char *one_byte_to_bits(unsigned char input_byte) {
     unsigned char bit_mask;
     unsigned char *bits;
 
+    // starting from the first bit
     for (int i = 0; i<8 ; i++) {
+        // set the bit mask to correspond with the appropriate bit
+        // this is done by shifting a single bit left from the
+        // last column (0000 0001) to the appropriate column,
+        // at most 7 spaces across (1000 0000)
         bit_mask = 1 << (7-i);
-        *(bits+i) = (first_byte & bit_mask) != 0;
-    }
 
-    for (int i = 0; i < 8; i++) {
-        printf("%d\n", *(bits+i));
+        // check if any of the bits within the input byte match with the bit mask
+        // if one bit does match then store a 1, otherwise store a 0
+        *(bits+i) = (input_byte & bit_mask) ? 1 : 0;
+
+        // eg:
+        //
+        // input_byte   1011 0111
+        // bitmask      0010 0000
+        //            = 0010 0000
+        // resolves as true and therefore 1
+        //
+        // whereas:
+        //
+        // input_byte   1011 0111
+        // bitmask      0000 1000
+        //            = 0000 0000
+        // resolves as false and therefore 0
     }
 
     return bits;
