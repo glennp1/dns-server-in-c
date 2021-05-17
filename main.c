@@ -2,7 +2,11 @@
 // Created by Glenn Phillips on 10/5/21.
 //
 
+#include <stdio.h>
 
+#include <unistd.h>
+
+#define ONE_BYTE 1
 
 typedef struct {
     // todo add the input arguments
@@ -11,10 +15,32 @@ typedef struct {
 
 int main(int argc, char *argv[]) {
 
-    // read_in_packet(char *argv)
+    for (int i = 1; i < argc; i++) {
+        printf("%s\n", argv[i]);
+    }
 
+    int input;
+    int count = 1;
+
+    while(read(STDIN_FILENO, &input, ONE_BYTE) > 0)
+    {
+        printf("%02x", input);
+        
+        if (count % 2 == 0) {
+            printf(" ");
+        }
+        
+        if (count % 16 == 0) {
+            printf("\n");
+        }
+        
+        count++;
+    }
+
+    printf("\n");
 
     return 0;
+
 }
 
 
