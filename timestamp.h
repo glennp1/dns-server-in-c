@@ -6,7 +6,6 @@
 #define TIMESTAMP_H
 
 // --- System Libraries ---
-#include <time.h> // for strftime, time etc.
 
 // --- Project Libraries ---
 

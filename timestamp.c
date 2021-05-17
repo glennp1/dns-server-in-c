@@ -3,11 +3,14 @@
 //
 
 // --- System Libraries ---
+#include <time.h> // for strftime, time etc.
 
 // --- Project Libraries ---
 #include "timestamp.h"
 
 // --- Constant Definitions ---
+#define TIME_SIZE 80
+#define TIME_FORMAT "%FT%T%z"
 
 // --- Type Definitions ---
 
@@ -23,13 +26,13 @@ char *get_timestamp() {
     char *formatted_time;
 
     // store the time in raw time
-    time( &raw_time);
+    time(&raw_time);
 
     // convert it the correct timezone
     local_time = localtime(&raw_time);
 
     // format the time as specified
-    strftime(formatted_time, 80, "%FT%T%z", local_time);
+    strftime(formatted_time, TIME_SIZE, TIME_FORMAT, local_time);
 
     // return the formatted time
     return formatted_time;
