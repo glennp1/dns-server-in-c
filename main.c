@@ -72,6 +72,9 @@ int main(int argc, char *argv[]) {
         printf("%d\n", *(bits + i));
     }
 
+    // display the formatted time, this is a test
+    printf("%s\n", get_timestamp());
+
     return 0;
 }
 

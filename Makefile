@@ -11,7 +11,7 @@
 CC = gcc
 CFLAGS = -I -Wall
 EXE = phase1 # todo Change this to dns_svr after done testing phase 1
-OBJ =
+OBJ = timestamp.o
 LOG = dns_svr.log
 
 # Handles "$ make" and "$ make all"
