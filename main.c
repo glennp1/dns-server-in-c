@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
     }
 
     // to store two separate bytes
-    unsigned char first_byte, second_byte;
+    byte_t first_byte, second_byte;
 
     // read in the first two bytes from the file in standard input and print them in hexadecimal
     read(STDIN_FILENO, &first_byte, ONE_BYTE);
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
     printf("\n");
 
     // convert this last byte into bits
-    unsigned char *bits = one_byte_to_bits(first_byte);
+    bit_t *bits = one_byte_to_bits(first_byte);
 
     // print each bit
     for (int i = 0; i < 8; i++) {

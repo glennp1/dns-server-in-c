@@ -22,14 +22,15 @@
 
 // todo potentially make bytes_to_integer function that handles all cases
 // Reads in two bytes from standard input and returns them as a single integer
-int two_bytes_to_integer(unsigned char first_byte, unsigned char second_byte) {
-    return first_byte << EIGHT_BIT_SHIFT | second_byte;
+int two_bytes_to_integer(byte_t first, byte_t second) {
+    // shift the first byte by eight bits left and merge it with the second byte
+    return first << EIGHT_BIT_SHIFT | second;
 }
 
-// Reads in one bytes from standard input and returns them as an array of 8 bits
-unsigned char *one_byte_to_bits(unsigned char input_byte) {
-    unsigned char bit_mask;
-    unsigned char *bits;
+// Reads in one byte from standard input and returns it as an array of 8 bits
+bit_t *one_byte_to_bits(byte_t input_byte) {
+    byte_t bit_mask;
+    bit_t *bits;
 
     // starting from the first bit
     for (int i = 0; i < 8 ; i++) {
