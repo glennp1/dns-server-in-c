@@ -18,4 +18,7 @@
 // Returns a string representation of the current time
 char *get_timestamp();
 
+// free the specified timestamp and all of its associated memory
+void free_timestamp(char *timestamp);
+
 #endif //TIMESTAMP_H
