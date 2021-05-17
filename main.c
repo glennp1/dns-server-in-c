@@ -2,60 +2,103 @@
 // Created by Glenn Phillips on 10/5/21.
 //
 
-#include <stdio.h>
+// todo
+//  read in a packet from std in
+//  parse the packet
+//  output the log entry to the file ./dns_svr.log
 
-#include <unistd.h>
+// --- System Libraries ---
+#include <stdio.h> // for output
+#include <unistd.h> // for read
+#include <stdlib.h> // for malloc
+
+// --- Project Libraries ---
+#include "timestamp.h"
+
+// --- Constant Definitions ---
 
 #define ONE_BYTE 1
+#define EIGHT_BIT_SHIFT 8
 
-typedef struct {
-    // todo add the input arguments
-} input_arguments_t;
+// --- Type Definitions ---
 
+// --- Function Prototypes ---
+
+// --- Helper Function Prototypes ---
+
+// Reads in two bytes from standard input and returns them as a single integer
+int two_bytes_to_integer(unsigned char first_byte, unsigned char second_byte);
+
+// Reads in one bytes from standard input and returns them as an array of 8 bits
+unsigned char *one_byte_to_bits(unsigned char first_byte);
+
+// --- Function Implementations ---
 
 int main(int argc, char *argv[]) {
 
+    // print the input arguments
     for (int i = 1; i < argc; i++) {
         printf("%s\n", argv[i]);
     }
 
-    int input;
-    int count = 1;
+    // to store two separate bytes
+    unsigned char first_byte, second_byte;
 
-    while(read(STDIN_FILENO, &input, ONE_BYTE) > 0)
-    {
-        printf("%02x", input);
-        
-        if (count % 2 == 0) {
-            printf(" ");
-        }
-        
-        if (count % 16 == 0) {
-            printf("\n");
-        }
-        
-        count++;
-    }
+    // read in the first two bytes from the file in standard input and print them in hexadecimal
+    read(STDIN_FILENO, &first_byte, ONE_BYTE);
+    read(STDIN_FILENO, &second_byte, ONE_BYTE);
+    printf("%02x ", first_byte);
+    printf("%02x\n", second_byte);
 
+    // print the first two bytes converted to an integer
+    printf("%d\n", two_bytes_to_integer(first_byte, second_byte));
+
+    // read in the next two bytes from the file in standard input and print them in hexadecimal
+    read(STDIN_FILENO, &first_byte, ONE_BYTE);
+    read(STDIN_FILENO, &second_byte, ONE_BYTE);
+    printf("%02x ", first_byte);
+    printf("%02x\n", second_byte);
+
+    // read in the next byte and print it in hexadecimal
+    read(STDIN_FILENO, &first_byte, ONE_BYTE);
+    printf("%02x\n", first_byte);
+
+    // leave a line blank
     printf("\n");
 
-    return 0;
+    // convert this last byte into bits and display this
+    unsigned char *bits = one_byte_to_bits(first_byte);
+    for (int i = 0; i < 8; i++) {
+        printf("%d\n", *(bits + i));
+    }
 
+    return 0;
 }
 
 
-// read in a packet from std in
+// --- Helper Function Implementations ---
 
-// input_arguments_t handle_input(int num_arguments, char *arguments[]) {
-//
-//
-// }
+// todo potentially make bytes_to_integer function that handles all cases
+// Reads in two bytes from standard input and returns them as a single integer
+int two_bytes_to_integer(unsigned char first_byte, unsigned char second_byte) {
+    return first_byte << EIGHT_BIT_SHIFT | second_byte;
+}
 
+// Reads in one bytes from standard input and returns them as an array of 8 bits
+unsigned char *one_byte_to_bits(unsigned char first_byte) {
+    unsigned char bit_mask;
+    unsigned char *bits;
 
-// parse the packet
+    for (int i = 0; i<8 ; i++) {
+        bit_mask = 1 << (7-i);
+        *(bits+i) = (first_byte & bit_mask) != 0;
+    }
 
+    for (int i = 0; i < 8; i++) {
+        printf("%d\n", *(bits+i));
+    }
 
-
-// output the log entry to the file ./dns_svr.log
+    return bits;
+}
 
 
