@@ -118,8 +118,6 @@ void display_output(byte_array_t *packet) {
 
             // todo clean this up
             char next_char = packet->bytes[packet_index + i];
-            printf("char: %c\n", next_char);
-
             entire_label[entire_label_index++] = next_char;
         }
 
@@ -159,7 +157,7 @@ void display_output(byte_array_t *packet) {
     // done with the timestamp, the packet and the label
     free_timestamp(timestamp);
     free_byte_array(packet);
-    free(entire_label)
+    free(entire_label);
 }
 
 // --- Helper Function Implementations ---
