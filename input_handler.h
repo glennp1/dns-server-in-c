@@ -9,12 +9,14 @@
 
 // --- Project Libraries ---
 
+#include "byte_converter.h"
+
 // --- Constant Definitions ---
 
 // --- Type Definitions ---
 
 // --- Function Prototypes ---
-// parses the input from standard input
-void parse_input(int num_args, char **args);
+// parses the input from standard input and returns the packet read in
+byte_array_t *parse_input(int num_args, char **args);
 
 #endif //INPUT_HANDLER_H

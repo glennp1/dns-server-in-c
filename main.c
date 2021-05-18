@@ -5,6 +5,7 @@
 // --- System Libraries ---
 
 // --- Project Libraries ---
+#include "byte_converter.h"
 #include "input_handler.h"
 #include "output_handler.h"
 
@@ -20,9 +21,9 @@
 
 int main(int argc, char *argv[]) {
 
-    parse_input(argc, argv);
+    byte_array_t *packet = parse_input(argc, argv);
 
-    display_output();
+    display_output(packet);
 
     return 0;
 }

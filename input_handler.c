@@ -14,8 +14,6 @@
 
 // --- Project Libraries ---
 #include "input_handler.h"
-#include "byte_converter.h"
-
 
 // --- Constant Definitions ---
 
@@ -34,10 +32,10 @@ byte_array_t *read_in_bytes(int num_bytes);
 
 // --- Function Implementations ---
 
-// parses the input from standard input
-void parse_input(int num_args, char **args) {
+// parses the input from standard input and returns the packet read in
+byte_array_t *parse_input(int num_args, char **args) {
 
-    // todo store the input arguments
+    // todo store the input arguments?
     for (int i = 1; i < num_args; i++) {
         printf("%s\n", args[i]);
     }
@@ -56,30 +54,16 @@ void parse_input(int num_args, char **args) {
     // convert these two bytes into an integer
     packet_length = two_bytes_to_integer(first_byte, second_byte);
 
-    // print the packet length
-    printf("%d\n", packet_length);
+    // we are done with the packet length in bytes
+    free_byte_array(packet_length_in_bytes);
 
     // to store the packet itself as an array of bytes
     byte_array_t *packet;
 
-    // todo for displaying
-//    printf("%02x\n", second_byte);
-
     // read in the remainder of the packet
     packet = read_in_bytes(packet_length);
 
-    // todo get 3rd byte in packet
-
-    // convert this 3rd byte to bits
-    bit_t *bits = one_byte_to_bits(packet->bytes[2]);
-
-    // print each bit
-    for (int i = 0; i < 8; i++) {
-        printf("%d\n", *(bits+i));
-    }
-
-    free(packet_length_in_bytes);
-    free(packet);
+    return packet;
 }
 
 // --- Helper Function Implementations ---

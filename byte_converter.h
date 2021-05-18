@@ -32,6 +32,9 @@ struct byte_array_s {
 // Returns a pointer to a new array of bytes
 byte_array_t *new_byte_array();
 
+// Frees the specified array of bytes and all of its associated memory
+void free_byte_array(byte_array_t *byte_array);
+
 // Takes two bytes as arguments and returns them as a single integer
 int two_bytes_to_integer(byte_t first, byte_t second);
 
