@@ -8,8 +8,12 @@
 #include <stdio.h> // for output
 #include <stdbool.h> // for booleans
 
-// todo remove later
-#include <stdlib.h> // for free
+#include <arpa/inet.h> // for inet_ntop and inet_pton
+
+#include <string.h> // for strcat
+
+// todo remove
+#include <stdlib.h>
 
 // --- Project Libraries ---
 #include "output_handler.h"
@@ -20,7 +24,8 @@
 
 // number of bytes reserved for the header
 #define HEADER_OFFSET 12
-#define AAAA_TYPE 28
+#define AAAA_QTYPE 28 // for qtype
+#define IN_QCLASS 1 // for qclass
 #define NULL_BYTE '\0'
 #define DOT_SEPARATOR '.'
 
@@ -40,10 +45,10 @@ void display_output(byte_array_t *packet) {
     // convert the 3rd byte in the packet to bits
     bit_t *bits = one_byte_to_bits(packet->bytes[2]);
 
-     // store if response or request
-     bool is_response = bits[0];
+    // store if response or request
+    bool is_response = bits[0];
 
-     // todo remove?
+    // todo remove?
 
 //    // print each bit
 //    for (int i = 0; i < 8; i++) {
@@ -85,7 +90,7 @@ void display_output(byte_array_t *packet) {
     }
 
     // stores the url
-    char *url = malloc(url_size * sizeof(char));
+    char url[url_size * sizeof(char)];
 
     // stores a specific label
     char *label;
@@ -103,8 +108,13 @@ void display_output(byte_array_t *packet) {
 
         // if the label has a size of zero it must be the end of the url
         if (label_size == 0) {
-            // add a null byte and exit the while loop
-            url[url_index++] = NULL_BYTE;
+            // add a null byte to the end of the url
+            url[url_index] = NULL_BYTE;
+
+            // increment the packet index to the next byte
+            packet_index++;
+
+            // exit the while loop
             break;
         }
 
@@ -125,39 +135,66 @@ void display_output(byte_array_t *packet) {
         packet_index = packet_index + label_size + 1;
     }
 
-    // todo
-
-    // to store the type
-    byte_t first_type_byte, second_type_byte;
-    int type;
-
-    // increment the next byte
-    packet_index++;
+    // to store the qtype
+    byte_t first_qtype_byte, second_qtype_byte;
+    int qtype;
 
     // get the next two bytes, increment afterwards
-    first_type_byte = packet->bytes[packet_index++];
-    second_type_byte = packet->bytes[packet_index++];
+    first_qtype_byte = packet->bytes[packet_index++];
+    second_qtype_byte = packet->bytes[packet_index++];
 
-    type = two_bytes_to_integer(first_type_byte, second_type_byte);
+    qtype = two_bytes_to_integer(first_qtype_byte, second_qtype_byte);
 
-    // display the formatted time, this is a test
+    // todo clean this up
+    // skip over the following 12 bytes to get to the rd length
+    packet_index += 12;
+
+    // store the next two bytes as the rd length
+    byte_t first_rd_length_byte, second_rd_length_byte;
+    int rd_length;
+
+    first_rd_length_byte = packet->bytes[packet_index++];
+    second_rd_length_byte = packet->bytes[packet_index++];
+
+    rd_length = two_bytes_to_integer(first_rd_length_byte, second_rd_length_byte);
+
+    // todo src must be network address structure
+
+    byte_t ip_address_bytes[sizeof(struct in6_addr)];
+
+    // store each of the bytes in the ip address
+    for (int i = 0; i < rd_length; i++) {
+        ip_address_bytes[i] = packet->bytes[packet_index++];
+    }
+
+    // todo dst must be the string
+    char ip_address_string[INET6_ADDRSTRLEN];
+
+    // todo figure this out
+    // rd data
+    inet_ntop(AF_INET6, &ip_address_bytes, ip_address_string, INET6_ADDRSTRLEN);
+
     char *timestamp = get_timestamp();
 
-    printf("%s ", timestamp);
+    FILE *file;
 
-    if (type != AAAA_TYPE) {
-        printf("unimplemented request\n");
+    file = fopen("dns_svr.log", "a");
+
+    fprintf(file, "%s ", timestamp);
+
+    if (qtype != AAAA_QTYPE) {
+        fprintf(file, "unimplemented request\n");
     }
     else {
         if (is_response) {
-            printf("%s is at\n", url);
+            fprintf(file, "%s is at %s\n", url, ip_address_string);
         }
     }
+    fclose(file);
 
-    // done with the timestamp, the packet and the label
+    // done with the timestamp amd the packet
     free_timestamp(timestamp);
     free_byte_array(packet);
-    free(url);
 }
 
 // --- Helper Function Implementations ---
