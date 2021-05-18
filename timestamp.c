@@ -52,7 +52,7 @@ char *get_timestamp() {
         timestamp = malloc(time_size);
 
         // todo remove
-        printf("new size: %d\n", time_size);
+        // printf("new size: %d\n", time_size);
     }
 
     // return the formatted timestamp
