@@ -41,21 +41,17 @@ byte_array_t *parse_input(int num_args, char **args) {
 //    }
 
     // to store the length of the packet
-    byte_array_t *packet_length_in_bytes;
+    byte_array_t *packet_length_bytes;
     int packet_length;
 
     // read in the packet length
-    packet_length_in_bytes = read_in_bytes(PACKET_LENGTH_SIZE);
-
-    // take the two bytes from the packet_length
-    byte_t first_byte = packet_length_in_bytes->bytes[0];
-    byte_t second_byte = packet_length_in_bytes->bytes[1];
+    packet_length_bytes = read_in_bytes(PACKET_LENGTH_SIZE);
 
     // convert these two bytes into an integer
-    packet_length = two_bytes_to_integer(first_byte, second_byte);
-
+    packet_length = two_bytes_to_integer(packet_length_bytes->bytes, 0);
+    
     // we are done with the packet length in bytes
-    free_byte_array(packet_length_in_bytes);
+    free_byte_array(packet_length_bytes);
 
     // to store the packet itself as an array of bytes
     byte_array_t *packet;

@@ -37,8 +37,10 @@ byte_array_t *new_byte_array();
 // Frees the specified array of bytes and all of its associated memory
 void free_byte_array(byte_array_t *byte_array);
 
-// Takes two bytes as arguments and returns them as a single integer
-int two_bytes_to_integer(byte_t first, byte_t second);
+// Takes a byte array and an index as arguments
+// Then takes the two bytes indicated by the index
+// and returns them as a single integer
+int two_bytes_to_integer(byte_t *bytes, int index);
 
 // Takes a single byte as an argument and returns it as an array of 8 bits
 bit_t *one_byte_to_bits(byte_t input_byte);

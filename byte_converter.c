@@ -47,12 +47,13 @@ void free_byte_array(byte_array_t *byte_array) {
     free(byte_array);
 }
 
-// todo potentially make bytes_to_integer function that handles all cases
-// Takes two bytes as arguments and returns them as a single integer
-int two_bytes_to_integer(byte_t first, byte_t second) {
+// Takes a byte array and an index as arguments
+// Then takes the two bytes indicated by the index
+// and returns them as a single integer
+int two_bytes_to_integer(byte_t *bytes, int index) {
 
     // shift the first byte by eight bits left and merge it with the second byte
-    return first << EIGHT_BIT_SHIFT | second;
+    return bytes[index] << EIGHT_BIT_SHIFT | bytes[index + 1];
  }
 
 // Takes a single byte as an argument and returns it as an array of 8 bits

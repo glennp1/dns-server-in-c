@@ -49,7 +49,6 @@ void display_output(byte_array_t *packet) {
     bool is_response = bits[0];
 
 
-
     // todo change this to separate function
     // done with bits
     free(bits);
@@ -130,35 +129,28 @@ void display_output(byte_array_t *packet) {
         packet_index = packet_index + label_size + 1;
     }
 
-    // to store the qtype
-    byte_t first_qtype_byte, second_qtype_byte;
-    int qtype;
-
-    // get the next two bytes, increment afterwards
-    first_qtype_byte = packet->bytes[packet_index++];
-    second_qtype_byte = packet->bytes[packet_index++];
-
-    qtype = two_bytes_to_integer(first_qtype_byte, second_qtype_byte);
-
     // todo clean this up
+    // to store the qtype
+    int qtype = two_bytes_to_integer(packet->bytes, packet_index);
+    
+    packet_index += 2;
+
     // skip over the following 12 bytes to get to the rd length
     packet_index += 12;
 
-    // store the next two bytes as the rd length
-    byte_t first_rd_length_byte, second_rd_length_byte;
-    int rd_length;
+    // store the next two bytes as the rdlength
+    int rdlength = two_bytes_to_integer(packet->bytes, packet_index);
 
-    first_rd_length_byte = packet->bytes[packet_index++];
-    second_rd_length_byte = packet->bytes[packet_index++];
+    packet_index += 2;
 
-    rd_length = two_bytes_to_integer(first_rd_length_byte, second_rd_length_byte);
+    printf("%d\n", rdlength);
 
     // todo src must be network address structure
 
     byte_t ip_address_bytes[sizeof(struct in6_addr)];
 
     // store each of the bytes in the ip address
-    for (int i = 0; i < rd_length; i++) {
+    for (int i = 0; i < rdlength; i++) {
         ip_address_bytes[i] = packet->bytes[packet_index++];
     }
 
