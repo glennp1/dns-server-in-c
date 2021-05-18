@@ -8,12 +8,13 @@
 // --- System Libraries ---
 
 // --- Project Libraries ---
+#include "packet.h"
 
 // --- Constant Definitions ---
 
 // --- Type Definitions ---
 
 // --- Function Prototypes ---
-void display_output();
+void display_output(packet_t *packet);
 
 #endif //OUTPUT_HANDLER_H

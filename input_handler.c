@@ -28,36 +28,38 @@
 // Reads in the specified number of bytes from standard input and
 // stores them within a newly created array of bytes
 // then returns a pointer to this array
-byte_array_t *read_in_bytes(int num_bytes);
+byte_t *read_in_bytes(int num_bytes);
 
 // --- Function Implementations ---
 
 // parses the input from standard input and returns the packet read in
-byte_array_t *parse_input(int num_args, char **args) {
+packet_t *parse_input(int num_args, char **args) {
 
 //    // todo store the input arguments?
 //    for (int i = 1; i < num_args; i++) {
 //        printf("%s\n", args[i]);
 //    }
 
-    // to store the length of the packet
-    byte_array_t *packet_length_bytes;
-    int packet_length;
+    // to store the bytes containing the length of the packet
+    byte_t *packet_length_bytes;
 
-    // read in the packet length
+    // read in the packet length bytes
     packet_length_bytes = read_in_bytes(PACKET_LENGTH_SIZE);
 
     // convert these two bytes into an integer
-    packet_length = two_bytes_to_integer(packet_length_bytes->bytes, 0);
-    
-    // we are done with the packet length in bytes
-    free_byte_array(packet_length_bytes);
+    int packet_length = two_bytes_to_integer(packet_length_bytes, 0);
 
-    // to store the packet itself as an array of bytes
-    byte_array_t *packet;
+    // we are done with this
+    free(packet_length_bytes);
 
-    // read in the remainder of the packet
-    packet = read_in_bytes(packet_length);
+    // to store the bytes within the actual packet
+    byte_t *packet_bytes;
+
+    // read in the packet bytes
+    packet_bytes = read_in_bytes(packet_length);
+
+    // create a new packet
+    packet_t *packet = new_packet(packet_bytes, packet_length);
 
     return packet;
 }
@@ -67,18 +69,15 @@ byte_array_t *parse_input(int num_args, char **args) {
 // Reads in the specified number of bytes from standard input and
 // stores them within a newly created array of bytes
 // then returns a pointer to this array
-byte_array_t *read_in_bytes(int num_bytes) {
+byte_t *read_in_bytes(int num_bytes) {
 
-    // Assign memory to a new array of bytes
-    byte_array_t *byte_array = new_byte_array(num_bytes);
-
-    // store the size of the bytes array
-    byte_array->size = num_bytes;
+    // to store the array of bytes
+    byte_t *bytes = malloc(num_bytes * sizeof(byte_t));
 
     // read in the bytes and store them in the bytes array
     for (int i = 0; i < num_bytes; i++) {
-        read(STDIN_FILENO, (byte_array->bytes + i), ONE_BYTE);
+        read(STDIN_FILENO, (bytes + i), ONE_BYTE);
     }
 
-    return byte_array;
+    return bytes;
 }

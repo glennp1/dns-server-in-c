@@ -35,7 +35,7 @@
 
 // --- Function Implementations ---
 
-void display_output(byte_array_t *packet) {
+void display_output(packet_t *packet) {
 
     // todo for displaying as hex
     //  printf("%02x\n", byte);
@@ -189,7 +189,7 @@ void display_output(byte_array_t *packet) {
 
     // done with the timestamp amd the packet
     free_timestamp(timestamp);
-    free_byte_array(packet);
+    free_packet(packet);
 }
 
 // --- Helper Function Implementations ---

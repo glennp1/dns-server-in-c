@@ -5,9 +5,10 @@
 // --- System Libraries ---
 
 // --- Project Libraries ---
-#include "byte_converter.h"
 #include "input_handler.h"
 #include "output_handler.h"
+#include "packet.h"
+
 
 // --- Constant Definitions ---
 
@@ -21,7 +22,7 @@
 
 int main(int argc, char *argv[]) {
 
-    byte_array_t *packet = parse_input(argc, argv);
+    packet_t *packet = parse_input(argc, argv);
 
     display_output(packet);
 
