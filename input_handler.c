@@ -35,10 +35,10 @@ byte_array_t *read_in_bytes(int num_bytes);
 // parses the input from standard input and returns the packet read in
 byte_array_t *parse_input(int num_args, char **args) {
 
-    // todo store the input arguments?
-    for (int i = 1; i < num_args; i++) {
-        printf("%s\n", args[i]);
-    }
+//    // todo store the input arguments?
+//    for (int i = 1; i < num_args; i++) {
+//        printf("%s\n", args[i]);
+//    }
 
     // to store the length of the packet
     byte_array_t *packet_length_in_bytes;

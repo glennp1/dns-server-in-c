@@ -48,12 +48,7 @@ void display_output(byte_array_t *packet) {
     // store if response or request
     bool is_response = bits[0];
 
-    // todo remove?
 
-//    // print each bit
-//    for (int i = 0; i < 8; i++) {
-//        printf("%d\n", bits[i]);
-//    }
 
     // todo change this to separate function
     // done with bits
@@ -190,7 +185,15 @@ void display_output(byte_array_t *packet) {
             fprintf(file, "%s is at %s\n", url, ip_address_string);
         }
     }
+
+    // todo not sure if this is necessary
+    // to ensure that log updates are timely, as specified in the spec
+    fflush(file);
+
+    // close the file
     fclose(file);
+
+
 
     // done with the timestamp amd the packet
     free_timestamp(timestamp);
