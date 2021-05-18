@@ -4,6 +4,8 @@
 
 // --- System Libraries ---
 
+#include <stdlib.h> // for malloc
+
 // --- Project Libraries ---
 #include "byte_converter.h"
 
@@ -20,14 +22,40 @@
 
 // --- Function Implementations ---
 
-// todo potentially make bytes_to_integer function that handles all cases
-// Reads in two bytes from standard input and returns them as a single integer
-int two_bytes_to_integer(byte_t first, byte_t second) {
-    // shift the first byte by eight bits left and merge it with the second byte
-    return first << EIGHT_BIT_SHIFT | second;
+// Returns a pointer to a new array of bytes
+byte_array_t *new_byte_array(int size) {
+
+    // initialise the array
+    byte_array_t *byte_array = malloc(sizeof(byte_array_t));
+
+    // initialise the size and bytes
+    byte_array->size = size;
+    byte_array->bytes = malloc(size * sizeof(byte_t));
+
+    return byte_array;
 }
 
-// Reads in one byte from standard input and returns it as an array of 8 bits
+// Frees the specified array of bytes and all of its associated memory
+void free_byte_array(byte_array_t *byte_array) {
+
+    // size does not need to be freed
+
+    // free the bytes
+    free(byte_array->bytes);
+
+    // free the byte array itself
+    free(byte_array);
+}
+
+// todo potentially make bytes_to_integer function that handles all cases
+// Takes two bytes as arguments and returns them as a single integer
+int two_bytes_to_integer(byte_t first, byte_t second) {
+
+    // shift the first byte by eight bits left and merge it with the second byte
+    return first << EIGHT_BIT_SHIFT | second;
+ }
+
+// Takes a single byte as an argument and returns it as an array of 8 bits
 bit_t *one_byte_to_bits(byte_t input_byte) {
     byte_t bit_mask;
     bit_t *bits;

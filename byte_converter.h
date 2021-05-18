@@ -19,12 +19,23 @@ typedef unsigned char byte_t;
 // represents one bit
 typedef unsigned char bit_t;
 
+// represents an array of bytes
+typedef struct byte_array_s byte_array_t;
+
+struct byte_array_s {
+    int size;
+    byte_t *bytes;
+};
+
 // --- Function Prototypes ---
 
-// Reads in two bytes from standard input and returns them as a single integer
+// Returns a pointer to a new array of bytes
+byte_array_t *new_byte_array();
+
+// Takes two bytes as arguments and returns them as a single integer
 int two_bytes_to_integer(byte_t first, byte_t second);
 
-// Reads in one byte from standard input and returns it as an array of 8 bits
+// Takes a single byte as an argument and returns it as an array of 8 bits
 bit_t *one_byte_to_bits(byte_t input_byte);
 
 #endif //BYTE_CONVERTER_H
