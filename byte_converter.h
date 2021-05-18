@@ -11,6 +11,8 @@
 
 // --- Constant Definitions ---
 
+#define BIT_ARRAY_SIZE 8
+
 // --- Type Definitions ---
 
 // represents one byte

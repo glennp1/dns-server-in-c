@@ -58,7 +58,7 @@ int two_bytes_to_integer(byte_t first, byte_t second) {
 // Takes a single byte as an argument and returns it as an array of 8 bits
 bit_t *one_byte_to_bits(byte_t input_byte) {
     byte_t bit_mask;
-    bit_t *bits;
+    bit_t *bits = malloc( BIT_ARRAY_SIZE * sizeof(bit_t));
 
     // starting from the first bit
     for (int i = 0; i < 8 ; i++) {
@@ -70,7 +70,7 @@ bit_t *one_byte_to_bits(byte_t input_byte) {
 
         // check if any of the bits within the input byte match with the bit mask
         // if one bit does match then store a 1, otherwise store a 0
-        *(bits+i) = (input_byte & bit_mask) ? 1 : 0;
+        bits[i] = (input_byte & bit_mask) ? 1 : 0;
 
         // eg:
         //
