@@ -56,8 +56,8 @@ void display_output(byte_array_t *packet) {
 
     // todo display the label
 
-    // stores the entire label size
-    int entire_label_size = 0;
+    // stores the url size
+    int url_size = 0;
 
     // stores the size of a specific label
     int label_size;
@@ -66,51 +66,51 @@ void display_output(byte_array_t *packet) {
     // set to the end of the header by default
     int packet_index = HEADER_OFFSET;
 
-    // calculate the entire label size
+    // calculate the url size
     while(1) {
-        // update the entire label size
+        // update the url size
         label_size = packet->bytes[packet_index];
-        entire_label_size += label_size;
+        url_size += label_size;
 
-        // if the label has a size of zero it must be the end
+        // if the label has a size of zero it must be the end of the url
         if (label_size == 0) {
             break;
         }
 
         // leave space for the dot separators and the null byte at the end
-        entire_label_size++;
+        url_size++;
 
         // increase the packet index by the label size plus one
         packet_index = packet_index + label_size + 1;
     }
 
-    // store the entire label
-    char *entire_label = malloc(entire_label_size * sizeof(char));
+    // stores the url
+    char *url = malloc(url_size * sizeof(char));
 
     // stores a specific label
     char *label;
     
-    // used to iterate through the entire label
-    int entire_label_index = 0;
+    // used to iterate through the url
+    int url_index = 0;
 
     // reset the packet index back to the end of the header
     packet_index = HEADER_OFFSET;
 
-    // populate the entire label
+    // populate the url
     while(1) {
         // update the label size
         label_size = packet->bytes[packet_index];
 
-        // if the label has a size of zero it must be the end
+        // if the label has a size of zero it must be the end of the url
         if (label_size == 0) {
             // add a null byte and exit the while loop
-            entire_label[entire_label_index++] = NULL_BYTE;
+            url[url_index++] = NULL_BYTE;
             break;
         }
 
         // if it is not the first entry add a dot separator
         if (packet_index != HEADER_OFFSET) {
-            entire_label[entire_label_index++] = DOT_SEPARATOR;
+            url[url_index++] = DOT_SEPARATOR;
         }
 
         // print each character in the label
@@ -118,7 +118,7 @@ void display_output(byte_array_t *packet) {
 
             // todo clean this up
             char next_char = packet->bytes[packet_index + i];
-            entire_label[entire_label_index++] = next_char;
+            url[url_index++] = next_char;
         }
 
         // increase the packet index by the label size plus one
@@ -150,14 +150,14 @@ void display_output(byte_array_t *packet) {
     }
     else {
         if (is_response) {
-            printf("%s is at\n", entire_label);
+            printf("%s is at\n", url);
         }
     }
 
     // done with the timestamp, the packet and the label
     free_timestamp(timestamp);
     free_byte_array(packet);
-    free(entire_label);
+    free(url);
 }
 
 // --- Helper Function Implementations ---
