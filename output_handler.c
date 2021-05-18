@@ -7,7 +7,9 @@
 // --- System Libraries ---
 #include <stdio.h> // for output
 #include <stdbool.h> // for booleans
-#include <string.h> // for concatenating strings
+
+// todo remove later
+#include <stdlib.h> // for free
 
 // --- Project Libraries ---
 #include "output_handler.h"
@@ -19,6 +21,8 @@
 // number of bytes reserved for the header
 #define HEADER_OFFSET 12
 #define AAAA_TYPE 28
+#define NULL_BYTE '\0'
+#define DOT_SEPARATOR '.'
 
 // --- Type Definitions ---
 
@@ -31,79 +35,131 @@ void display_output(byte_array_t *packet) {
     // todo for displaying as hex
     //  printf("%02x\n", byte);
 
-    // print the packet length
-    printf("%d\n", packet->size);
+    // todo store if response or request
 
     // convert the 3rd byte in the packet to bits
     bit_t *bits = one_byte_to_bits(packet->bytes[2]);
 
+     // store if response or request
+     bool is_response = bits[0];
 
-    // store if response or request
-    bool is_response = bits[0];
+     // todo remove?
 
-    // print each bit
-    for (int i = 0; i < 8; i++) {
-        printf("%d\n", bits[i]);
-    }
+//    // print each bit
+//    for (int i = 0; i < 8; i++) {
+//        printf("%d\n", bits[i]);
+//    }
+
+    // todo change this to separate function
+    // done with bits
+    free(bits);
 
     // todo display the label
 
-    // stores the next byte to display
-    int next_byte = HEADER_OFFSET;
+    // stores the entire label size
+    int entire_label_size = 0;
 
-    // store the entire label
-    char entire_label[1000] = "";
-
-    // stores the size of each label
+    // stores the size of a specific label
     int label_size;
 
-    // continue until all of the labels have been read
-    while(true) {
+    // used to iterate through the current packet
+    // set to the end of the header by default
+    int packet_index = HEADER_OFFSET;
 
-        // store the label size
-        label_size = packet->bytes[next_byte];
+    // calculate the entire label size
+    while(1) {
+        // update the entire label size
+        label_size = packet->bytes[packet_index];
+        entire_label_size += label_size;
 
-        // if there is no label left to print then it must be the end
+        // if the label has a size of zero it must be the end
         if (label_size == 0) {
             break;
         }
 
-        // if it is not the first entry print a dot separator
-        if (next_byte != HEADER_OFFSET) {
-            strcat(entire_label, ".");
+        // leave space for the dot separators and the null byte at the end
+        entire_label_size++;
+
+        // increase the packet index by the label size plus one
+        packet_index = packet_index + label_size + 1;
+    }
+
+    // store the entire label
+    char *entire_label = malloc(entire_label_size * sizeof(char));
+
+    // stores a specific label
+    char *label;
+    
+    // used to iterate through the entire label
+    int entire_label_index = 0;
+
+    // reset the packet index back to the end of the header
+    packet_index = HEADER_OFFSET;
+
+    // populate the entire label
+    while(1) {
+        // update the label size
+        label_size = packet->bytes[packet_index];
+
+        // if the label has a size of zero it must be the end
+        if (label_size == 0) {
+            // add a null byte and exit the while loop
+            entire_label[entire_label_index++] = NULL_BYTE;
+            break;
+        }
+
+        // if it is not the first entry add a dot separator
+        if (packet_index != HEADER_OFFSET) {
+            entire_label[entire_label_index++] = DOT_SEPARATOR;
         }
 
         // print each character in the label
         for (int i = 1; i <= label_size; i++ ) {
 
-            char label_char = packet->bytes[next_byte + i];
+            // todo clean this up
+            char next_char = packet->bytes[packet_index + i];
+            printf("char: %c\n", next_char);
 
-            strcat(entire_label, &label_char);
+            entire_label[entire_label_index++] = next_char;
         }
 
-        // increase the offset
-        next_byte = next_byte + label_size + 1;
+        // increase the packet index by the label size plus one
+        packet_index = packet_index + label_size + 1;
     }
 
-    // display the label
-    printf("%s\n", entire_label);
+    // todo
 
     // to store the type
     byte_t first_type_byte, second_type_byte;
     int type;
 
+    // increment the next byte
+    packet_index++;
+
     // get the next two bytes, increment afterwards
-    first_type_byte = packet->bytes[next_byte++];
-    second_type_byte = packet->bytes[next_byte++];
+    first_type_byte = packet->bytes[packet_index++];
+    second_type_byte = packet->bytes[packet_index++];
 
     type = two_bytes_to_integer(first_type_byte, second_type_byte);
 
     // display the formatted time, this is a test
     char *timestamp = get_timestamp();
 
-    printf("%s\n", timestamp);
+    printf("%s ", timestamp);
 
+    if (type != AAAA_TYPE) {
+        printf("unimplemented request\n");
+    }
+    else {
+        if (is_response) {
+            printf("%s is at\n", entire_label);
+        }
+    }
+
+    // done with the timestamp, the packet and the label
     free_timestamp(timestamp);
+    free_byte_array(packet);
+    free(entire_label)
 }
 
 // --- Helper Function Implementations ---
