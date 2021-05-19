@@ -26,10 +26,12 @@
 #define NULL_BYTE '\0'
 #define DOT_SEPARATOR '.'
 
-#define AAAA_QTYPE 28 // for qtype
+#define AAAA_TYPE 28 // for qtype and first atype
+#define QTYPE_OFFSET_FROM_URL_END 1
+#define FIRST_ATYPE_OFFSET_FROM_URL_END 7
 
-#define RDLENGTH_OFFSET_FROM_URL_END 14
-#define IP_ADDR_OFFSET_FROM_URL_END 16
+#define RDLENGTH_OFFSET_FROM_URL_END 15
+#define IP_ADDR_OFFSET_FROM_URL_END 17
 
 // --- Type Definitions ---
 
@@ -46,6 +48,9 @@ void extract_url(packet_t *packet);
 
 // extracts the if the qtype of the packet is AAAA
 void extract_qtype_is_aaaa(packet_t *packet);
+
+// extracts the if the first atype of the packet is AAAA
+void extract_first_atype_is_aaaa(packet_t *packet);
 
 // extracts the length of the ip address
 void extract_rdlength(packet_t *packet);
@@ -71,11 +76,19 @@ packet_t *new_packet(byte_t *bytes, int length) {
     extract_url(packet);
     extract_qtype_is_aaaa(packet);
 
-    // only extract the packet ip address if the packet is a response that
-    // is properly implemented
-    if (packet->qtype_is_aaaa && packet->is_response) {
-        extract_rdlength(packet);
-        extract_ip_address(packet);
+    //  if the packet is a response that has the correct question type
+    if (packet->is_response && packet->qtype_is_aaaa) {
+
+        // initialise whether the packet answer type is aaaa
+        extract_first_atype_is_aaaa(packet);
+
+        // if the packet has the correct answer type
+        if (packet->first_atype_is_aaaa) {
+
+            // initialise the length of the ip and and ip itself
+            extract_rdlength(packet);
+            extract_ip_address(packet);
+        }
     }
 
     return packet;
@@ -191,14 +204,28 @@ void extract_url(packet_t *packet) {
 void extract_qtype_is_aaaa(packet_t *packet) {
 
     // used to iterate through the current packet
-    // set to the end of the header plus the size of the url
-    int packet_index = HEADER_OFFSET + packet->url_size + ONE_BYTE_OFFSET;
+    int packet_index = HEADER_OFFSET + packet->url_size
+            + QTYPE_OFFSET_FROM_URL_END;
 
     // store the two bytes at the packet index as the qtype
     int qtype = two_bytes_to_integer(packet->bytes, packet_index);
 
     // store if the qtype matches AAAA
-    packet->qtype_is_aaaa = (qtype == AAAA_QTYPE);
+    packet->qtype_is_aaaa = (qtype == AAAA_TYPE);
+}
+
+// extracts the if the first atype of the packet is AAAA
+void extract_first_atype_is_aaaa(packet_t *packet) {
+
+    // used to iterate through the current packet
+    int packet_index = HEADER_OFFSET + packet->url_size
+            + FIRST_ATYPE_OFFSET_FROM_URL_END;
+
+    // store the two bytes at the packet index as the first atype
+    int first_atype = two_bytes_to_integer(packet->bytes, packet_index);
+
+    // store if the first atype matches AAAA
+    packet->first_atype_is_aaaa = (first_atype == AAAA_TYPE);
 }
 
 // extracts the length of the ip address
@@ -211,10 +238,8 @@ void extract_rdlength(packet_t *packet) {
     }
 
     // used to iterate through the current packet
-    // set to the end of the header plus the size of the url
-    // plus the rdlength offset
     int packet_index = HEADER_OFFSET + packet->url_size
-            + RDLENGTH_OFFSET_FROM_URL_END + ONE_BYTE_OFFSET;
+            + RDLENGTH_OFFSET_FROM_URL_END;
 
     // store the two bytes at the packet index as the rdlength
     packet->rdlength = two_bytes_to_integer(packet->bytes, packet_index);
@@ -230,10 +255,8 @@ void extract_ip_address(packet_t *packet) {
     }
 
     // used to iterate through the current packet
-    // set to the end of the header plus the size of the url
-    // plus the ip address offset
     int packet_index = HEADER_OFFSET + packet->url_size
-                       + IP_ADDR_OFFSET_FROM_URL_END + ONE_BYTE_OFFSET;
+                       + IP_ADDR_OFFSET_FROM_URL_END;
 
     // ip address bytes must store the network address structure
     byte_t ip_address_bytes[sizeof(struct in6_addr)];

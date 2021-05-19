@@ -39,18 +39,32 @@ void display_output(packet_t *packet) {
 
     file = fopen("dns_svr.log", "a");
 
-    fprintf(file, "%s ", timestamp);
-
+    // todo not sure if this should be at the start
+    // if the type of the question is AAAA
     if (packet->qtype_is_aaaa) {
+
+        // if the packet is a response
         if (packet->is_response) {
-            fprintf(file, "%s is at %s\n", packet->url, packet->ip_address);
+
+            // if the type of the first answer is AAAA
+            if (packet->first_atype_is_aaaa) {
+                // add the response to the log file
+                fprintf(file, "%s %s is at %s\n", timestamp, packet->url, packet->ip_address);
+            }
+            // otherwise if the type of the first answer is not AAAA
+            else {
+                // do not add a log entry
+            }
         }
+        // otherwise if the packet is a request
         else {
-            fprintf(file, "requested %s\n", packet->url);
+            // add the request to the log file
+            fprintf(file, "%s requested %s\n", timestamp, packet->url);
         }
     }
+    // otherwise if the type of the question is not AAAA
     else {
-        fprintf(file, "unimplemented request\n");
+        fprintf(file, "%s unimplemented request\n", timestamp);
     }
 
     // todo not sure if this is necessary

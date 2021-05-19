@@ -24,7 +24,8 @@ struct packet_s {
     bool is_response;
     int url_size;
     char *url;
-    bool qtype_is_aaaa;
+    bool qtype_is_aaaa; // for question type
+    bool first_atype_is_aaaa; // for first answer type
     int rdlength;
     char *ip_address;
 };
