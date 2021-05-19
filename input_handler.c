@@ -61,6 +61,8 @@ packet_t *parse_input(int num_args, char **args) {
     // create a new packet
     packet_t *packet = new_packet(packet_bytes, packet_length);
 
+    // todo move other parsing to HERE
+
     return packet;
 }
 
@@ -80,4 +82,9 @@ byte_t *read_in_bytes(int num_bytes) {
     }
 
     return bytes;
+}
+
+// todo maybe implement something like this to skip over unwanted bytes
+void discard_bytes(int num_bytes) {
+
 }

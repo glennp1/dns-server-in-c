@@ -22,7 +22,8 @@ struct packet_s {
     byte_t *bytes;
     int length;
     bool is_response;
-    int url;
+    int url_size;
+    char *url;
     int qtype;
     int rdlength;
     char *ip_address;
@@ -31,7 +32,7 @@ struct packet_s {
 // --- Function Prototypes ---
 
 // todo new packet
-packet_t *new_packet(byte_t *bytes, int length);
+packet_t *new_packet();
 
 // todo free packet
 void free_packet(packet_t *packet);

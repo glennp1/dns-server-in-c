@@ -8,7 +8,6 @@
 #include <stdio.h> // for output
 #include <stdbool.h> // for booleans
 
-#include <arpa/inet.h> // for inet_ntop and inet_pton
 
 #include <string.h> // for strcat
 
@@ -23,11 +22,10 @@
 // --- Constant Definitions ---
 
 // number of bytes reserved for the header
-#define HEADER_OFFSET 12
 #define AAAA_QTYPE 28 // for qtype
+
+// todo might not be required
 #define IN_QCLASS 1 // for qclass
-#define NULL_BYTE '\0'
-#define DOT_SEPARATOR '.'
 
 // --- Type Definitions ---
 
@@ -37,130 +35,6 @@
 
 void display_output(packet_t *packet) {
 
-    // todo for displaying as hex
-    //  printf("%02x\n", byte);
-
-    // todo store if response or request
-
-    // convert the 3rd byte in the packet to bits
-    bit_t *bits = one_byte_to_bits(packet->bytes[2]);
-
-    // store if response or request
-    bool is_response = bits[0];
-
-
-    // todo change this to separate function
-    // done with bits
-    free(bits);
-
-    // todo display the label
-
-    // stores the url size
-    int url_size = 0;
-
-    // stores the size of a specific label
-    int label_size;
-
-    // used to iterate through the current packet
-    // set to the end of the header by default
-    int packet_index = HEADER_OFFSET;
-
-    // calculate the url size
-    while(1) {
-        // update the url size
-        label_size = packet->bytes[packet_index];
-        url_size += label_size;
-
-        // if the label has a size of zero it must be the end of the url
-        if (label_size == 0) {
-            break;
-        }
-
-        // leave space for the dot separators and the null byte at the end
-        url_size++;
-
-        // increase the packet index by the label size plus one
-        packet_index = packet_index + label_size + 1;
-    }
-
-    // stores the url
-    char url[url_size * sizeof(char)];
-
-    // stores a specific label
-    char *label;
-    
-    // used to iterate through the url
-    int url_index = 0;
-
-    // reset the packet index back to the end of the header
-    packet_index = HEADER_OFFSET;
-
-    // populate the url
-    while(1) {
-        // update the label size
-        label_size = packet->bytes[packet_index];
-
-        // if the label has a size of zero it must be the end of the url
-        if (label_size == 0) {
-            // add a null byte to the end of the url
-            url[url_index] = NULL_BYTE;
-
-            // increment the packet index to the next byte
-            packet_index++;
-
-            // exit the while loop
-            break;
-        }
-
-        // if it is not the first entry add a dot separator
-        if (packet_index != HEADER_OFFSET) {
-            url[url_index++] = DOT_SEPARATOR;
-        }
-
-        // print each character in the label
-        for (int i = 1; i <= label_size; i++ ) {
-
-            // todo clean this up
-            char next_char = packet->bytes[packet_index + i];
-            url[url_index++] = next_char;
-        }
-
-        // increase the packet index by the label size plus one
-        packet_index = packet_index + label_size + 1;
-    }
-
-    // todo clean this up
-    // to store the qtype
-    int qtype = two_bytes_to_integer(packet->bytes, packet_index);
-    
-    packet_index += 2;
-
-    // skip over the following 12 bytes to get to the rd length
-    packet_index += 12;
-
-    // store the next two bytes as the rdlength
-    int rdlength = two_bytes_to_integer(packet->bytes, packet_index);
-
-    packet_index += 2;
-
-    printf("%d\n", rdlength);
-
-    // todo src must be network address structure
-
-    byte_t ip_address_bytes[sizeof(struct in6_addr)];
-
-    // store each of the bytes in the ip address
-    for (int i = 0; i < rdlength; i++) {
-        ip_address_bytes[i] = packet->bytes[packet_index++];
-    }
-
-    // todo dst must be the string
-    char ip_address_string[INET6_ADDRSTRLEN];
-
-    // todo figure this out
-    // rd data
-    inet_ntop(AF_INET6, &ip_address_bytes, ip_address_string, INET6_ADDRSTRLEN);
-
     char *timestamp = get_timestamp();
 
     FILE *file;
@@ -169,18 +43,18 @@ void display_output(packet_t *packet) {
 
     fprintf(file, "%s ", timestamp);
 
-    if (qtype != AAAA_QTYPE) {
+    if (packet->qtype != AAAA_QTYPE) {
         fprintf(file, "unimplemented request\n");
     }
     else {
-        if (is_response) {
-            fprintf(file, "%s is at %s\n", url, ip_address_string);
+        if (packet->is_response) {
+            fprintf(file, "%s is at %s\n", packet->url, packet->ip_address);
         }
     }
 
     // todo not sure if this is necessary
     // to ensure that log updates are timely, as specified in the spec
-    fflush(file);
+    // fflush(file);
 
     // close the file
     fclose(file);
