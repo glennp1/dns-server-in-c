@@ -18,12 +18,15 @@
 #define IS_RES_BYTE_INDEX 2
 #define IS_RES_BIT_INDEX 0
 
+// number of bytes reserved for the header
 #define HEADER_OFFSET 12
 #define ONE_BYTE_OFFSET 1
 
 #define FIRST_INDEX 0
 #define NULL_BYTE '\0'
 #define DOT_SEPARATOR '.'
+
+#define AAAA_QTYPE 28 // for qtype
 
 #define RDLENGTH_OFFSET_FROM_URL_END 14
 #define IP_ADDR_OFFSET_FROM_URL_END 16
@@ -41,8 +44,8 @@ void extract_url_size(packet_t *packet);
 // extracts the url stored within the packet
 void extract_url(packet_t *packet);
 
-// extracts the type of the packet, must be AAAA
-void extract_qtype(packet_t *packet);
+// extracts the if the qtype of the packet is AAAA
+void extract_qtype_is_aaaa(packet_t *packet);
 
 // extracts the length of the ip address
 void extract_rdlength(packet_t *packet);
@@ -66,9 +69,14 @@ packet_t *new_packet(byte_t *bytes, int length) {
     extract_is_response(packet);
     extract_url_size(packet);
     extract_url(packet);
-    extract_qtype(packet);
-    extract_rdlength(packet);
-    extract_ip_address(packet);
+    extract_qtype_is_aaaa(packet);
+
+    // only extract the packet ip address if the packet is a response that
+    // is properly implemented
+    if (packet->qtype_is_aaaa && packet->is_response) {
+        extract_rdlength(packet);
+        extract_ip_address(packet);
+    }
 
     return packet;
 }
@@ -179,15 +187,18 @@ void extract_url(packet_t *packet) {
     }
 }
 
-// extracts the type of the packet, must be AAAA
-void extract_qtype(packet_t *packet) {
+// extracts the if the qtype of the packet is AAAA
+void extract_qtype_is_aaaa(packet_t *packet) {
 
     // used to iterate through the current packet
     // set to the end of the header plus the size of the url
     int packet_index = HEADER_OFFSET + packet->url_size + ONE_BYTE_OFFSET;
 
     // store the two bytes at the packet index as the qtype
-    packet->qtype = two_bytes_to_integer(packet->bytes, packet_index);
+    int qtype = two_bytes_to_integer(packet->bytes, packet_index);
+
+    // store if the qtype matches AAAA
+    packet->qtype_is_aaaa = (qtype == AAAA_QTYPE);
 }
 
 // extracts the length of the ip address
@@ -232,7 +243,7 @@ void extract_ip_address(packet_t *packet) {
         ip_address_bytes[i] = packet->bytes[packet_index++];
     }
 
-    // ip address string must be the of an approriate size
+    // ip address string must be the of an appropriate size
     packet->ip_address = malloc(INET6_ADDRSTRLEN * sizeof(char));
 
     // todo figure this out

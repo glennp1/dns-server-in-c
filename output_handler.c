@@ -21,8 +21,6 @@
 
 // --- Constant Definitions ---
 
-// number of bytes reserved for the header
-#define AAAA_QTYPE 28 // for qtype
 
 // todo might not be required
 #define IN_QCLASS 1 // for qclass
@@ -43,13 +41,16 @@ void display_output(packet_t *packet) {
 
     fprintf(file, "%s ", timestamp);
 
-    if (packet->qtype != AAAA_QTYPE) {
-        fprintf(file, "unimplemented request\n");
-    }
-    else {
+    if (packet->qtype_is_aaaa) {
         if (packet->is_response) {
             fprintf(file, "%s is at %s\n", packet->url, packet->ip_address);
         }
+        else {
+            fprintf(file, "requested %s\n", packet->url);
+        }
+    }
+    else {
+        fprintf(file, "unimplemented request\n");
     }
 
     // todo not sure if this is necessary
@@ -58,8 +59,6 @@ void display_output(packet_t *packet) {
 
     // close the file
     fclose(file);
-
-
 
     // done with the timestamp amd the packet
     free_timestamp(timestamp);

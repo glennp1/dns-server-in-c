@@ -24,7 +24,7 @@ struct packet_s {
     bool is_response;
     int url_size;
     char *url;
-    int qtype;
+    bool qtype_is_aaaa;
     int rdlength;
     char *ip_address;
 };
