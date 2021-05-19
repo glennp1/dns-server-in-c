@@ -10,13 +10,21 @@
 # Variables
 CC = gcc
 CFLAGS = -I -Wall
-EXE = phase1 # todo Change this to dns_svr after done testing phase 1
+BIN_PHASE1 = phase1
+BIN_PHASE2 = dns_query
 OBJ = input_handler.o output_handler.o packet.o byte_converter.o timestamp.o
 LOG = dns_svr.log
 
 # Handles "$ make" and "$ make all"
-all: main.c $(OBJ)
-	$(CC) -o $(EXE) main.c $(OBJ) $(CFLAGS)
+all: $(BIN_PHASE1) $(BIN_PHASE2)
+
+# For phase 1
+$(BIN_PHASE1): phase1.c $(OBJ)
+	$(CC) -o $(BIN_PHASE1) phase1.c $(OBJ) $(CFLAGS)
+
+# For phase 2
+$(BIN_PHASE2): main.c $(OBJ)
+	$(CC) -o $(BIN_PHASE2) main.c $(OBJ) $(CFLAGS)
 
 # Wildcard rule to make any .o file,
 # given a .c and .h file with the same leading filename component
