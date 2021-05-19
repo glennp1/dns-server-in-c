@@ -11,7 +11,7 @@
 CC = gcc
 CFLAGS = -I -Wall
 BIN_PHASE1 = phase1
-BIN_PHASE2 = dns_query
+BIN_PHASE2 = dns_svr
 OBJ = input_handler.o output_handler.o packet.o byte_converter.o timestamp.o
 LOG = dns_svr.log
 
