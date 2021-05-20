@@ -37,10 +37,6 @@
 // maximum number of connections is 100, as per the specification sheet
 #define BACKLOG 100
 
-// todo update this later? not sure what max would be?
-// max number of characters that will be read from the client
-#define CLIENT_INPUT_BUFFER_SIZE 150
-
 // --- Type Definitions ---
 
 // --- Helper Function Prototypes ---
@@ -73,7 +69,6 @@ server_t *setup_server(int argc, char *argv[]) {
     return server;
 }
 
-// todo currently receives some input from a client and prints it to stdout
 // starts the specified server, this can only be terminated via the console
 void start_server(server_t *server) {
 
@@ -86,26 +81,6 @@ void start_server(server_t *server) {
     int sockfd = setup_client_connection();
 
     start_client_connection(sockfd);
-
-    // Receives requests containing an domain name
-
-    // Looks up the IP address with the server (from std in)
-
-    // Returns a response containing the IP address
-
-    // todo accept a dns query over TCP on port 8053
-
-    // todo forward it to a server ipv4 (NOT IPV6????) address is the first
-    //  command line argument, port is second command line argument
-
-    // todo not sure how to test
-
-    // todo send the response back to the client over the SAME TCP CONNECTION
-    //  separate TCP connection for each query/response with the client
-    //  -- log as described
-
-    // todo program should be ready to accept another query as soon as it has
-    //  processed the previous query and response
 
 }
 
@@ -230,36 +205,29 @@ void start_client_connection(int sockfd) {
             continue;
         }
 
-        // todo remove
-        printf("#1\n");
-
         // take the stream from the client message store it as a packet
         // this will print the packet as well
         client_packet = new_packet(client_sockfd);
-
-        // todo remove
-        printf("#2\n");
 
         // update the log accordingly
         display_output(client_packet);
 
         // todo forward request to upstream server
+        // todo forward it to a server ipv4 (NOT IPV6????) address is the first
+        //  command line argument, port is second command line argument
 
         // todo receive response from upstream server
 
-        // todo forward response to client
+        // todo send the response back to the client over the SAME TCP CONNECTION
+        //  separate TCP connection for each query/response with the client
+        //  -- log as described
 
-        // todo remove
-        printf("#3\n");
-
-        // todo done, make sure we free everything
+        // todo program should be ready to accept another query as soon as it has
+        //  processed the previous query and response
 
         // todo make sure everything is freed
         // done with the packet
         free_packet(client_packet);
-
-        // todo remove
-        printf("#4\n");
 
         // done reading the message
         close(client_sockfd);
