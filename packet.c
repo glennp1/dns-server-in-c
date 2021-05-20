@@ -99,9 +99,6 @@ packet_t *new_packet(int input_file) {
         }
     }
 
-    // todo remove
-    print_packet_bytes(packet);
-
     return packet;
 }
 
@@ -146,6 +143,10 @@ void extract_length_and_bytes(packet_t *packet, int input_file) {
     // read in the remaining packet, starting from the end
     // of the packet length bytes
     read(input_file, packet->bytes + PACKET_LENGTH_SIZE, remaining_packet_length);
+
+    // todo remove
+    printf("packet length: %d\n", packet->length);
+    print_packet_bytes(packet);
 }
 
 // extracts if the packet is a response or a request
@@ -170,6 +171,9 @@ void extract_url_size(packet_t *packet) {
     // used to iterate through the current packet
     // set to the end of the header
     int packet_index = HEADER_OFFSET;
+
+    // set the url size to zero to begin with
+    packet->url_size = 0;
 
     // add each label size to the url size until the end of the url is reached
     while(1) {
@@ -266,12 +270,6 @@ void extract_first_atype_is_aaaa(packet_t *packet) {
 // extracts the length of the ip address
 void extract_rdlength(packet_t *packet) {
 
-    // todo fix
-    // if the packet is a request then this cannot be extracted
-    if (!packet->is_response) {
-        return;
-    }
-
     // used to iterate through the current packet
     int packet_index = HEADER_OFFSET + packet->url_size
             + RDLENGTH_OFFSET_FROM_URL_END;
@@ -282,12 +280,6 @@ void extract_rdlength(packet_t *packet) {
 
 // extracts the ip address stored within the packet
 void extract_ip_address(packet_t *packet) {
-
-    // todo fix
-    // if the packet is a request then this cannot be extracted
-    if (!packet->is_response) {
-        return;
-    }
 
     // used to iterate through the current packet
     int packet_index = HEADER_OFFSET + packet->url_size
@@ -304,8 +296,9 @@ void extract_ip_address(packet_t *packet) {
     // ip address string must be the of an appropriate size
     packet->ip_address = malloc(INET6_ADDRSTRLEN * sizeof(char));
 
-    // todo figure this out
-    // rd data
+    // todo not sure if this needs to handle ipv4 addresses as well?
+    // convert the ip address in bytes into a string and store it in
+    // packet->ip_address
     inet_ntop(AF_INET6, &ip_address_bytes, packet->ip_address, INET6_ADDRSTRLEN);
 }
 
