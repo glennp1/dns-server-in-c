@@ -19,7 +19,6 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <sys/wait.h>
-#include <signal.h>
 
 // --- Project Libraries ---
 #include "server.h"
@@ -27,6 +26,10 @@
 #include "output_handler.h"
 
 // --- Constant Definitions ---
+
+#define CORRECT_NUM_ARGUMENTS 3
+#define UPSTREAM_SERVER_IP_INDEX 1
+#define UPSTREAM_SERVER_PORT_INDEX 2
 
 #define PORT "8053"
 
@@ -42,14 +45,37 @@
 
 // --- Helper Function Prototypes ---
 
-void sigchld_handler(int s);
+// todo
+int setup_client_connection();
 
-void *get_in_addr(struct sockaddr *sa);
+// todo
+void start_client_connection(int sockfd);
 
 // --- Function Implementations ---
 
+// takes the input from the command line interface and sets up a new server
+server_t *setup_server(int argc, char *argv[]) {
+
+    // initialise the server
+    server_t *server = malloc(sizeof(server_t));
+
+    // if the number of arguments is incorrect
+    if (argc != CORRECT_NUM_ARGUMENTS) {
+        // there is a problem, exit
+        printf("Error: Incorrect number of arguments entered\n");
+        exit(1);
+    }
+
+    // initialise upstream server ip and port
+    server->upstream_server_ip = argv[UPSTREAM_SERVER_IP_INDEX];
+    server->upstream_server_port = argv[UPSTREAM_SERVER_PORT_INDEX];
+
+    return server;
+}
+
 // todo currently receives some input from a client and prints it to stdout
-void start_server(char *server_address, char *server_port) {
+// starts the specified server, this can only be terminated via the console
+void start_server(server_t *server) {
 
     // todo not sure if the server should ever exit because of an error?
     //  or should it keep going?
@@ -57,6 +83,9 @@ void start_server(char *server_address, char *server_port) {
     // DNS SERVER
 
     // Set up a socket so it can receive and send
+    int sockfd = setup_client_connection();
+
+    start_client_connection(sockfd);
 
     // Receives requests containing an domain name
 
@@ -78,10 +107,20 @@ void start_server(char *server_address, char *server_port) {
     // todo program should be ready to accept another query as soon as it has
     //  processed the previous query and response
 
+}
+
+void free_server(server_t *server) {
+    free(server);
+}
+
+// --- Helper Function Implementations ---
+
+
+// todo
+int setup_client_connection() {
     // initialise variables
     int sockfd;  // listen on sock_fd
     struct addrinfo hints, *servinfo, *p;
-
     int enable = 1;
     int rv;
 
@@ -155,8 +194,11 @@ void start_server(char *server_address, char *server_port) {
         exit(1);
     }
 
-    // todo SPLIT
+    return sockfd;
+}
 
+// todo
+void start_client_connection(int sockfd) {
     struct sockaddr_storage client_addr; // connector's address information
     socklen_t sin_size;
     int client_sockfd; // new connection on client_sockfd
@@ -188,9 +230,15 @@ void start_server(char *server_address, char *server_port) {
             continue;
         }
 
+        // todo remove
+        printf("#1\n");
+
         // take the stream from the client message store it as a packet
         // this will print the packet as well
         client_packet = new_packet(client_sockfd);
+
+        // todo remove
+        printf("#2\n");
 
         // update the log accordingly
         display_output(client_packet);
@@ -201,19 +249,21 @@ void start_server(char *server_address, char *server_port) {
 
         // todo forward response to client
 
+        // todo remove
+        printf("#3\n");
+
         // todo done, make sure we free everything
 
         // todo make sure everything is freed
         // done with the packet
         free_packet(client_packet);
 
+        // todo remove
+        printf("#4\n");
+
         // done reading the message
         close(client_sockfd);
     }
-
     // NOTE: because the above loop is infinite, and we are not required to implement
     // signal handling, sockfd is never closed.
 }
-
-// --- Helper Function Implementations ---
-

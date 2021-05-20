@@ -20,11 +20,10 @@
 
 int main(int argc, char *argv[]) {
 
-
-
+    server_t *server = setup_server(argc, argv);
 
     // todo start server
-    start_server(argv[1], argv[2]);
+    start_server(server);
 
     return 0;
 }
