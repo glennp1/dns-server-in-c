@@ -23,6 +23,8 @@
 
 // --- Project Libraries ---
 #include "server.h"
+#include "packet.h"
+#include "output_handler.h"
 
 // --- Constant Definitions ---
 
@@ -186,12 +188,25 @@ void start_server(char *server_address, char *server_port) {
         // done receiving messages
         close(sockfd);
 
-        char buff[CLIENT_INPUT_BUFFER_SIZE];
 
-        // read the message from client and copy it in buffer
-        read(new_sockfd, buff, sizeof(buff));
-        // print buffer which contains the client contents
-        printf("From client: %s\n", buff);
+        // take the stream from the client message store it as a packet
+        // this will print the packet as well
+        packet_t *client_packet = new_packet(new_sockfd);
+
+        // update the log accordingly
+        display_output(client_packet);
+
+        // todo make sure everything is freed
+        // done with the packet
+        free_packet(client_packet);
+
+        // no longer reading the message normally
+//        char buff[CLIENT_INPUT_BUFFER_SIZE];
+//
+//        // read the message from client and copy it in buffer
+//        read(new_sockfd, buff, sizeof(buff));
+//        // print buffer which contains the client contents
+//        printf("From client: %s\n", buff);
 
         // done reading the message
         close(new_sockfd);
