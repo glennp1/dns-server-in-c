@@ -41,24 +41,26 @@
 
 // --- Helper Function Prototypes ---
 
-// sets up the socket to connect with the client, then returns the socket
-int setup_client_connection();
+// sets up the socket to connect with the client
+void setup_client_connection(server_t *server);
 
 // starts listening on the client socket, this can only be terminated via the console
-void start_client_connection(int client_sockfd);
+void start_client_connection(server_t *server);
 
 // accept and respond to any connections on the client socket
-void respond_client_connection(int client_sockfd);
+void respond_client_connection(server_t *server);
 
-// sets up the socket to connect with the upstream server, then returns the socket
-int setup_upstream_connection();
+// todo single upstream connection for now, perhaps implement multiple later
+// sets up the socket to connect with the upstream server
+void setup_upstream_connection(server_t *server);
 
-// starts the connection with the upstream server, then returns the socket created
-int start_upstream_connection();
+// todo not sure if necessary (maybe merge with above function)
+// starts the connection with the upstream server, via the connect function
+void start_upstream_connection(server_t *server);
 
-// sends the specified request to the upstream server via the connection specified
-// by the socket
-packet_t *query_upstream_connection(int upstream_connfd, packet_t *client_packet);
+// sends the specified request packet to the upstream server,
+// then returns the response packet
+packet_t *query_upstream_connection(server_t *server, packet_t *client_packet);
 
 // --- Function Implementations ---
 
@@ -88,13 +90,17 @@ void start_server(server_t *server) {
     // todo not sure if the server should ever exit because of an error?
     //  or should it keep going?
 
-    // DNS SERVER
+    // set up a socket to respond to client requests,
+    // details are stored within server
+    setup_client_connection(server);
 
-    // Set up a socket so it can receive and send
-    int client_sockfd = setup_client_connection();
+    // set up a socket to query the upstream server,
+    // details are stored within server
+    // todo
+    // setup_upstream_connection(server);
 
-    start_client_connection(client_sockfd);
-
+    // start listening on the client socket
+    start_client_connection(server);
 }
 
 void free_server(server_t *server) {
@@ -104,10 +110,9 @@ void free_server(server_t *server) {
 // --- Helper Function Implementations ---
 
 
-// sets up the socket to connect with the client, then returns the socket
-int setup_client_connection() {
+// sets up the socket to connect with the client
+void setup_client_connection(server_t *server) {
     // initialise variables
-    int client_sockfd;  // listen on sock_fd
     struct addrinfo hints, *servinfo, *p;
     int enable = 1;
     int rv;
@@ -137,10 +142,10 @@ int setup_client_connection() {
     for (p = servinfo; p != NULL; p = p->ai_next) {
 
         // attempt to create a new socket using the current socket address structure
-        client_sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+        server->client_sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
 
         // check if creating the new socket failed
-        if (client_sockfd == -1) {
+        if (server->client_sockfd == -1) {
             // if it did then exit
             printf("Socket creation failed\n");
             exit(1);
@@ -148,7 +153,8 @@ int setup_client_connection() {
 
         // attempt to set the options of the socket, this ensures that bound ports
         // and interfaces can be reused
-        if (setsockopt(client_sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
+        if (setsockopt(server->client_sockfd, SOL_SOCKET, SO_REUSEADDR,
+                       &enable, sizeof(int)) < 0) {
 
             // if unsuccessful, then exit
             printf("Setting socket options failed\n");
@@ -156,12 +162,12 @@ int setup_client_connection() {
         }
 
         // attempt to bind the socket
-        if (bind(client_sockfd, p->ai_addr, p->ai_addrlen) == -1) {
+        if (bind(server->client_sockfd, p->ai_addr, p->ai_addrlen) == -1) {
 
             // if unsuccessful, close this socket and continue to the next loop
             // this will cause the program to try another socket with a different
             // address structure
-            close(client_sockfd);
+            close(server->client_sockfd);
             printf("Socket bind failed\n");
             continue;
         }
@@ -182,15 +188,13 @@ int setup_client_connection() {
         printf("Socket bind failed\n");
         exit(1);
     }
-
-    return client_sockfd;
 }
 
 // starts listening on the client socket, this can only be terminated via the console
-void start_client_connection(int client_sockfd) {
+void start_client_connection(server_t *server) {
 
     // attempt to mark the socket as listening (passive)
-    if (listen(client_sockfd, BACKLOG) == -1) {
+    if (listen(server->client_sockfd, BACKLOG) == -1) {
 
         // if unsuccessful, then exit
         printf("Socket listen failed\n");
@@ -200,37 +204,38 @@ void start_client_connection(int client_sockfd) {
     printf("server: waiting for connections...\n");
 
     while(1) {  // main accept() loop
-        respond_client_connection(client_sockfd);
+        respond_client_connection(server);
     }
-    // NOTE: because the above loop is infinite, and we are not required to implement
+    // NOTE: Due to the above loop being infinite, and that we are not required to implement
     // signal handling, client_sockfd is never closed.
+    // In addition, neither is upstream_sockfd.
+    // However, client_connfd is closed after a response has been finished.
 }
 
 // accept and respond to any connections on the client socket
-void respond_client_connection(int client_sockfd) {
+void respond_client_connection(server_t *server) {
     struct sockaddr_storage client_addr; // connector's address information
     socklen_t sin_size;
-    int client_connfd; // new connection on client_connfd
     packet_t *client_packet;
 
     sin_size = sizeof client_addr;
 
     // attempt to accept a connection from the client and create a socket
-    client_connfd = accept(client_sockfd, (struct sockaddr *)&client_addr, &sin_size);
+    server->client_connfd = accept(server->client_sockfd, (struct sockaddr *)&client_addr, &sin_size);
 
     // if the connection was unsuccessful
-    if (client_connfd == -1) {
+    if (server->client_connfd == -1) {
 
         // display there was an error
         printf("Socket accept failed\n");
 
         // continue to wait for other connections
-        continue;
+        return;
     }
 
     // take the stream from the client message store it as a packet
     // this will print the packet as well
-    client_packet = new_packet(client_connfd);
+    client_packet = new_packet(server->client_connfd);
 
     // update the log accordingly
     display_output(client_packet);
@@ -239,9 +244,8 @@ void respond_client_connection(int client_sockfd) {
     // todo forward it to a server ipv4 (NOT IPV6????) address is the first
     //  command line argument, port is second command line argument
 
-    int upstream_sockfd = setup_upstream_connection();
-
-    query_upstream_connection(upstream_sockfd, client_packet);
+    // todo
+    // query_upstream_connection(server, client_packet);
 
     // todo receive response from upstream server
 
@@ -257,25 +261,66 @@ void respond_client_connection(int client_sockfd) {
     free_packet(client_packet);
 
     // done reading the message
-    close(client_connfd);
+    close(server->client_connfd);
 }
 
-// sets up the socket to connect with the upstream server, then returns the socket
-int setup_upstream_connection() {
+// todo single upstream connection for now, perhaps implement multiple later
+// sets up the socket to connect with the upstream server
+void setup_upstream_connection(server_t *server) {
+
+    int numbytes;
+    struct addrinfo hints, *servinfo, *p;
+    int rv;
+    char s[INET6_ADDRSTRLEN];
+
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+
+    // todo change this to some different kind of error?
+    if ((rv = getaddrinfo(server->upstream_server_ip, server->upstream_server_port,
+                          &hints, &servinfo)) != 0) {
+        // fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+        exit(1);
+    }
+
+    // loop through all the results and connect to the first we can
+    for(p = servinfo; p != NULL; p = p->ai_next) {
+        if ((server->upstream_sockfd = socket(p->ai_family, p->ai_socktype,
+                             p->ai_protocol)) == -1) {
+            printf("client: socket\n");
+            continue;
+        }
+
+        if (connect(server->upstream_sockfd, p->ai_addr, p->ai_addrlen) == -1) {
+            close(server->upstream_sockfd);
+            printf("client: connect\n");
+            continue;
+        }
+
+        break;
+    }
+
+    if (p == NULL) {
+        printf("client: failed to connect\n");
+        exit(1);
+    }
+
+    freeaddrinfo(servinfo); // all done with this structure
+}
+
+// todo not sure if necessary (maybe merge with above function)
+// starts the connection with the upstream server, via the connect function
+void start_upstream_connection(server_t *server) {
 
     // todo
 
 }
 
-// starts the connection with the upstream server, then returns the socket created
-int start_upstream_connection() {
+// sends the specified request to the upstream server via the socket,
+// then returns the response
+packet_t *query_upstream_connection(server_t *server, packet_t *client_packet) {
 
-    // todo
-
-}
-
-// sends the specified request to the upstream server via the connection specified
-// by the socket
-packet_t *query_upstream_connection(int upstream_connfd, packet_t *client_packet) {
-
+    // todo this is a placeholder
+    return client_packet;
 }

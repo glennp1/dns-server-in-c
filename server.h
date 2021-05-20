@@ -19,6 +19,9 @@ typedef struct server_s server_t;
 struct server_s {
     char *upstream_server_ip;
     char *upstream_server_port;
+    int client_sockfd; // listen on client_sockfd
+    int client_connfd; // new connection on client_connfd
+    int upstream_sockfd; // connect on upstream_sockfd
 };
 
 // --- Function Prototypes ---
