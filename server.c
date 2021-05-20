@@ -41,11 +41,24 @@
 
 // --- Helper Function Prototypes ---
 
-// todo
+// sets up the socket to connect with the client, then returns the socket
 int setup_client_connection();
 
-// todo
+// starts listening on the client socket, this can only be terminated via the console
 void start_client_connection(int client_sockfd);
+
+// accept and respond to any connections on the client socket
+void respond_client_connection(int client_sockfd);
+
+// sets up the socket to connect with the upstream server, then returns the socket
+int setup_upstream_connection();
+
+// starts the connection with the upstream server, then returns the socket created
+int start_upstream_connection();
+
+// sends the specified request to the upstream server via the connection specified
+// by the socket
+packet_t *query_upstream_connection(int upstream_connfd, packet_t *client_packet);
 
 // --- Function Implementations ---
 
@@ -91,7 +104,7 @@ void free_server(server_t *server) {
 // --- Helper Function Implementations ---
 
 
-// todo
+// sets up the socket to connect with the client, then returns the socket
 int setup_client_connection() {
     // initialise variables
     int client_sockfd;  // listen on sock_fd
@@ -118,6 +131,7 @@ int setup_client_connection() {
         exit(1);
     }
 
+    // todo clean up the naming so this is more readable
     // iterate through the list of socket address structures and
     // bind to the first one available
     for (p = servinfo; p != NULL; p = p->ai_next) {
@@ -172,12 +186,8 @@ int setup_client_connection() {
     return client_sockfd;
 }
 
-// todo
+// starts listening on the client socket, this can only be terminated via the console
 void start_client_connection(int client_sockfd) {
-    struct sockaddr_storage client_addr; // connector's address information
-    socklen_t sin_size;
-    int client_connfd; // new connection on client_connfd
-    packet_t *client_packet;
 
     // attempt to mark the socket as listening (passive)
     if (listen(client_sockfd, BACKLOG) == -1) {
@@ -190,53 +200,82 @@ void start_client_connection(int client_sockfd) {
     printf("server: waiting for connections...\n");
 
     while(1) {  // main accept() loop
-        sin_size = sizeof client_addr;
-
-        // attempt to accept a connection from the client and create a socket
-        client_connfd = accept(client_sockfd, (struct sockaddr *)&client_addr, &sin_size);
-
-        // if the connection was unsuccessful
-        if (client_connfd == -1) {
-
-            // display there was an error
-            printf("Socket accept failed\n");
-
-            // continue to wait for other connections
-            continue;
-        }
-
-        // take the stream from the client message store it as a packet
-        // this will print the packet as well
-        client_packet = new_packet(client_connfd);
-
-        // update the log accordingly
-        display_output(client_packet);
-
-        // todo forward request to upstream server
-        // todo forward it to a server ipv4 (NOT IPV6????) address is the first
-        //  command line argument, port is second command line argument
-
-        // upstream_sockfd = setup_upstream_connection();
-
-
-
-
-        // todo receive response from upstream server
-
-        // todo send the response back to the client over the SAME TCP CONNECTION
-        //  separate TCP connection for each query/response with the client
-        //  -- log as described
-
-        // todo program should be ready to accept another query as soon as it has
-        //  processed the previous query and response
-
-        // todo make sure everything is freed
-        // done with the packet
-        free_packet(client_packet);
-
-        // done reading the message
-        close(client_connfd);
+        respond_client_connection(client_sockfd);
     }
     // NOTE: because the above loop is infinite, and we are not required to implement
     // signal handling, client_sockfd is never closed.
+}
+
+// accept and respond to any connections on the client socket
+void respond_client_connection(int client_sockfd) {
+    struct sockaddr_storage client_addr; // connector's address information
+    socklen_t sin_size;
+    int client_connfd; // new connection on client_connfd
+    packet_t *client_packet;
+
+    sin_size = sizeof client_addr;
+
+    // attempt to accept a connection from the client and create a socket
+    client_connfd = accept(client_sockfd, (struct sockaddr *)&client_addr, &sin_size);
+
+    // if the connection was unsuccessful
+    if (client_connfd == -1) {
+
+        // display there was an error
+        printf("Socket accept failed\n");
+
+        // continue to wait for other connections
+        continue;
+    }
+
+    // take the stream from the client message store it as a packet
+    // this will print the packet as well
+    client_packet = new_packet(client_connfd);
+
+    // update the log accordingly
+    display_output(client_packet);
+
+    // todo forward request to upstream server
+    // todo forward it to a server ipv4 (NOT IPV6????) address is the first
+    //  command line argument, port is second command line argument
+
+    int upstream_sockfd = setup_upstream_connection();
+
+    query_upstream_connection(upstream_sockfd, client_packet);
+
+    // todo receive response from upstream server
+
+    // todo send the response back to the client over the SAME TCP CONNECTION
+    //  separate TCP connection for each query/response with the client
+    //  -- log as described
+
+    // todo program should be ready to accept another query as soon as it has
+    //  processed the previous query and response
+
+    // todo make sure everything is freed
+    // done with the packet
+    free_packet(client_packet);
+
+    // done reading the message
+    close(client_connfd);
+}
+
+// sets up the socket to connect with the upstream server, then returns the socket
+int setup_upstream_connection() {
+
+    // todo
+
+}
+
+// starts the connection with the upstream server, then returns the socket created
+int start_upstream_connection() {
+
+    // todo
+
+}
+
+// sends the specified request to the upstream server via the connection specified
+// by the socket
+packet_t *query_upstream_connection(int upstream_connfd, packet_t *client_packet) {
+
 }
