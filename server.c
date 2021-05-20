@@ -246,6 +246,9 @@ void respond_client_connection(server_t *server) {
 
     response_packet = query_upstream_connection(server, request_packet);
 
+    // update the log accordingly
+    display_output(response_packet);
+
     close(server->upstream_sockfd);
 
 

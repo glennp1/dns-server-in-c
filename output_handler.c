@@ -71,7 +71,7 @@ void display_output(packet_t *packet) {
 
     // todo not sure if this is necessary
     // to ensure that log updates are timely, as specified in the spec
-    // fflush(file);
+    fflush(file);
 
     // close the file
     fclose(file);
