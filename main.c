@@ -6,6 +6,8 @@
 
 // --- Project Libraries ---
 
+#include "server.h"
+
 // --- Constant Definitions ---
 
 // --- Type Definitions ---
@@ -17,6 +19,12 @@
 // --- Function Implementations ---
 
 int main(int argc, char *argv[]) {
+
+
+
+
+    // todo start server
+    start_server(argv[1], argv[2]);
 
     return 0;
 }
