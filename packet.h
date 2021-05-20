@@ -32,10 +32,10 @@ struct packet_s {
 
 // --- Function Prototypes ---
 
-// todo new packet
-packet_t *new_packet();
+// creates and returns a new packet based on the specified input
+packet_t *new_packet(int input_file);
 
-// todo free packet
+// frees the specified packet and all of its associated memory
 void free_packet(packet_t *packet);
 
 #endif //PACKET_H

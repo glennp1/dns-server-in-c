@@ -15,7 +15,10 @@
 // --- Type Definitions ---
 
 // --- Function Prototypes ---
-// parses the input from standard input and returns the packet read in
-packet_t *parse_input(int num_args, char **args);
+
+// Reads in the specified number of bytes from the specified input file
+// and stores them within a newly created array of bytes
+// then returns a pointer to this array
+byte_t *read_in_bytes(int input_file, int num_bytes);
 
 #endif //INPUT_HANDLER_H

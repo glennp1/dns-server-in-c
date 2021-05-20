@@ -3,6 +3,7 @@
 //
 
 // --- System Libraries ---
+#include <unistd.h> // for STDIN_FILENO
 
 // --- Project Libraries ---
 #include "input_handler.h"
@@ -22,7 +23,8 @@
 
 int main(int argc, char *argv[]) {
 
-    packet_t *packet = parse_input(argc, argv);
+    // create a new packet
+    packet_t *packet = new_packet(STDIN_FILENO);
 
     display_output(packet);
 

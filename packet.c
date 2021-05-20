@@ -5,21 +5,25 @@
 // --- System Libraries ---
 #include <stdlib.h> // for malloc
 #include <arpa/inet.h> // for inet_ntop and inet_pton
-
+#include <unistd.h> // for read
 
 // todo remove
 #include <stdio.h>
 
 // --- Project Libraries ---
 #include "packet.h"
+#include "input_handler.h"
 
 // --- Constant Definitions ---
 
-#define IS_RES_BYTE_INDEX 2
+// The number of bytes that stores the packet length
+#define PACKET_LENGTH_SIZE 2
+
+#define IS_RES_BYTE_INDEX 4
 #define IS_RES_BIT_INDEX 0
 
 // number of bytes reserved for the header
-#define HEADER_OFFSET 12
+#define HEADER_OFFSET 14
 #define ONE_BYTE_OFFSET 1
 
 #define FIRST_INDEX 0
@@ -36,6 +40,9 @@
 // --- Type Definitions ---
 
 // --- Helper Function Prototypes ---
+
+// extracts the length of the packet and uses this to store the bytes
+void extract_length_and_bytes(packet_t *packet, int input_file);
 
 // extracts if the packet is a response or a request
 void extract_is_response(packet_t *packet);
@@ -58,17 +65,18 @@ void extract_rdlength(packet_t *packet);
 // extracts the ip address stored within the packet
 void extract_ip_address(packet_t *packet);
 
+// prints the bytes in the packet, this is used for debugging
+void print_packet_bytes(packet_t *packet);
+
 // --- Function Implementations ---
 
-// todo new packet
-packet_t *new_packet(byte_t *bytes, int length) {
+// creates and returns a new packet based on the specified input
+packet_t *new_packet(int input_file) {
 
     // initialise the packet
     packet_t *packet = malloc(sizeof(packet_t));
 
-    // initialise the bytes and length
-    packet->bytes = bytes;
-    packet->length = length;
+    extract_length_and_bytes(packet, input_file);
 
     // initialise the other parameters
     extract_is_response(packet);
@@ -91,18 +99,17 @@ packet_t *new_packet(byte_t *bytes, int length) {
         }
     }
 
+    // todo remove
+    print_packet_bytes(packet);
+
     return packet;
 }
 
-// todo free packet
+// frees the specified packet and all of its associated memory
 void free_packet(packet_t *packet) {
 
-    // free the bytes
+    // free everything stored within the packet
     free(packet->bytes);
-
-    // length does not need to be freed
-
-    // todo free other parameters
     free(packet->url);
     free(packet->ip_address);
 
@@ -111,6 +118,31 @@ void free_packet(packet_t *packet) {
 }
 
 // --- Helper Function Implementations ---
+
+// extracts the length of the packet and uses this to store the bytes
+void extract_length_and_bytes(packet_t *packet, int input_file) {
+    // to store the number of bytes that haven't been read yet
+    int remaining_packet_length;
+
+    // allocate memory to store the bytes within the packet
+    packet->bytes = malloc(PACKET_LENGTH_SIZE * sizeof(byte_t));
+
+    // read in the bytes that store the length of the remaining packet
+    read(input_file, packet->bytes, PACKET_LENGTH_SIZE);
+
+    // convert these two bytes into an integer to store the packet length
+    remaining_packet_length = two_bytes_to_integer(packet->bytes, 0);
+
+    // calculate and store the length of the entire packet
+    packet->length = PACKET_LENGTH_SIZE + remaining_packet_length;
+
+    // reallocate the memory to store all of the bytes within the packet
+    packet->bytes = realloc(packet->bytes, packet->length * sizeof(byte_t));
+
+    // read in the remaining packet, starting from the end
+    // of the packet length bytes
+    read(input_file, packet->bytes + PACKET_LENGTH_SIZE, remaining_packet_length);
+}
 
 // extracts if the packet is a response or a request
 void extract_is_response(packet_t *packet) {
@@ -272,6 +304,20 @@ void extract_ip_address(packet_t *packet) {
     // todo figure this out
     // rd data
     inet_ntop(AF_INET6, &ip_address_bytes, packet->ip_address, INET6_ADDRSTRLEN);
-
 }
 
+// prints the bytes in the packet, this is used for debugging
+void print_packet_bytes(packet_t *packet) {
+    for (int i = 1; i <= packet->length; i++) {
+        printf("%02x", packet->bytes[i-1]);
+
+        if (i % 2 == 0) {
+            printf(" ");
+        }
+
+        if (i % 16 == 0) {
+            printf("\n");
+        }
+    }
+    printf("\n");
+}
