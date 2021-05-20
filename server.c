@@ -94,11 +94,6 @@ void start_server(server_t *server) {
     // details are stored within server
     setup_client_connection(server);
 
-    // set up a socket to query the upstream server,
-    // details are stored within server
-    // todo
-    // setup_upstream_connection(server);
-
     // start listening on the client socket
     start_client_connection(server);
 }
@@ -208,15 +203,13 @@ void start_client_connection(server_t *server) {
     }
     // NOTE: Due to the above loop being infinite, and that we are not required to implement
     // signal handling, client_sockfd is never closed.
-    // In addition, neither is upstream_sockfd.
-    // However, client_connfd is closed after a response has been finished.
 }
 
 // accept and respond to any connections on the client socket
 void respond_client_connection(server_t *server) {
     struct sockaddr_storage client_addr; // connector's address information
     socklen_t sin_size;
-    packet_t *client_packet;
+    packet_t *request_packet, *response_packet;
 
     sin_size = sizeof client_addr;
 
@@ -235,17 +228,26 @@ void respond_client_connection(server_t *server) {
 
     // take the stream from the client message store it as a packet
     // this will print the packet as well
-    client_packet = new_packet(server->client_connfd);
+    request_packet = new_packet(server->client_connfd);
 
     // update the log accordingly
-    display_output(client_packet);
+    display_output(request_packet);
 
     // todo forward request to upstream server
     // todo forward it to a server ipv4 (NOT IPV6????) address is the first
     //  command line argument, port is second command line argument
 
     // todo
-    // query_upstream_connection(server, client_packet);
+
+    // set up a socket to query the upstream server,
+    // details are stored within server
+
+    setup_upstream_connection(server);
+
+    response_packet = query_upstream_connection(server, request_packet);
+
+    close(server->upstream_sockfd);
+
 
     // todo receive response from upstream server
 
@@ -258,7 +260,9 @@ void respond_client_connection(server_t *server) {
 
     // todo make sure everything is freed
     // done with the packet
-    free_packet(client_packet);
+    free_packet(request_packet);
+
+    free_packet(response_packet);
 
     // done reading the message
     close(server->client_connfd);
@@ -268,18 +272,16 @@ void respond_client_connection(server_t *server) {
 // sets up the socket to connect with the upstream server
 void setup_upstream_connection(server_t *server) {
 
-    int numbytes;
     struct addrinfo hints, *servinfo, *p;
     int rv;
-    char s[INET6_ADDRSTRLEN];
 
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
 
-    // todo change this to some different kind of error?
     if ((rv = getaddrinfo(server->upstream_server_ip, server->upstream_server_port,
                           &hints, &servinfo)) != 0) {
+        // todo change this to some different kind of error?
         // fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
         exit(1);
     }
@@ -319,8 +321,16 @@ void start_upstream_connection(server_t *server) {
 
 // sends the specified request to the upstream server via the socket,
 // then returns the response
-packet_t *query_upstream_connection(server_t *server, packet_t *client_packet) {
+packet_t *query_upstream_connection(server_t *server, packet_t *request_packet) {
+
+    // todo write function
+
+    // todo not sure how this will work
+    write(server->upstream_sockfd, request_packet->bytes, request_packet->length);
+
+    // todo read function
+    packet_t *response_packet = new_packet(server->upstream_sockfd);
 
     // todo this is a placeholder
-    return client_packet;
+    return response_packet;
 }
