@@ -28,6 +28,9 @@ int main(int argc, char *argv[]) {
 
     display_output(packet);
 
+    // we are done with the packet
+    free_packet(packet);
+
     return 0;
 }
 

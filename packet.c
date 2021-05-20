@@ -111,7 +111,11 @@ void free_packet(packet_t *packet) {
     // free everything stored within the packet
     free(packet->bytes);
     free(packet->url);
-    free(packet->ip_address);
+
+    // only need to free the ip address if the packet has a response
+    if (packet->is_response) {
+        free(packet->ip_address);
+    }
 
     // free the packet itself
     free(packet);
@@ -192,8 +196,7 @@ void extract_url(packet_t *packet) {
     // allocate the correct amount of memory to the url
     packet->url = malloc(packet->url_size * sizeof(char));
 
-    // stores a specific label and its size
-    char *label;
+    // stores the size of a specific label
     int label_size;
 
     // used to iterate through the url

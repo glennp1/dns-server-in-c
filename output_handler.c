@@ -76,9 +76,8 @@ void display_output(packet_t *packet) {
     // close the file
     fclose(file);
 
-    // done with the timestamp amd the packet
+    // done with the timestamp
     free_timestamp(timestamp);
-    free_packet(packet);
 }
 
 // --- Helper Function Implementations ---
