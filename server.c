@@ -58,9 +58,7 @@ void start_server(char *server_address, char *server_port) {
 
     // Set up a socket so it can receive and send
 
-
     // Receives requests containing an domain name
-
 
     // Looks up the IP address with the server (from std in)
 
@@ -81,10 +79,9 @@ void start_server(char *server_address, char *server_port) {
     //  processed the previous query and response
 
     // initialise variables
-    int sockfd, new_sockfd;  // listen on sock_fd, new connection on new_sockfd
+    int sockfd;  // listen on sock_fd
     struct addrinfo hints, *servinfo, *p;
-    struct sockaddr_storage client_addr; // connector's address information
-    socklen_t sin_size;
+
     int enable = 1;
     int rv;
 
@@ -158,6 +155,13 @@ void start_server(char *server_address, char *server_port) {
         exit(1);
     }
 
+    // todo SPLIT
+
+    struct sockaddr_storage client_addr; // connector's address information
+    socklen_t sin_size;
+    int client_sockfd; // new connection on client_sockfd
+    packet_t *client_packet;
+
     // attempt to mark the socket as listening (passive)
     if (listen(sockfd, BACKLOG) == -1) {
 
@@ -172,10 +176,10 @@ void start_server(char *server_address, char *server_port) {
         sin_size = sizeof client_addr;
 
         // attempt to accept a connection from the client and create a socket
-        new_sockfd = accept(sockfd, (struct sockaddr *)&client_addr, &sin_size);
+        client_sockfd = accept(sockfd, (struct sockaddr *)&client_addr, &sin_size);
 
         // if the connection was unsuccessful
-        if (new_sockfd == -1) {
+        if (client_sockfd == -1) {
 
             // display there was an error
             printf("Socket accept failed\n");
@@ -184,36 +188,32 @@ void start_server(char *server_address, char *server_port) {
             continue;
         }
 
-        // todo we are only receiving one message for now
-        // done receiving messages
-        close(sockfd);
-
-
         // take the stream from the client message store it as a packet
         // this will print the packet as well
-        packet_t *client_packet = new_packet(new_sockfd);
+        client_packet = new_packet(client_sockfd);
 
         // update the log accordingly
         display_output(client_packet);
+
+        // todo forward request to upstream server
+
+        // todo receive response from upstream server
+
+        // todo forward response to client
+
+        // todo done, make sure we free everything
 
         // todo make sure everything is freed
         // done with the packet
         free_packet(client_packet);
 
-        // no longer reading the message normally
-//        char buff[CLIENT_INPUT_BUFFER_SIZE];
-//
-//        // read the message from client and copy it in buffer
-//        read(new_sockfd, buff, sizeof(buff));
-//        // print buffer which contains the client contents
-//        printf("From client: %s\n", buff);
-
         // done reading the message
-        close(new_sockfd);
-
-        // done
-        exit(1);
+        close(client_sockfd);
     }
+
+    // NOTE: because the above loop is infinite, and we are not required to implement
+    // signal handling, sockfd is never closed.
 }
 
 // --- Helper Function Implementations ---
+
