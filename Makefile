@@ -12,8 +12,9 @@ CC = gcc
 CFLAGS = -I -Wall
 BIN_PHASE1 = phase1
 BIN_PHASE2 = dns_svr
-OBJ = input_handler.o output_handler.o packet.o byte_converter.o timestamp.o
 LOG = dns_svr.log
+
+OBJ = input_handler.o output_handler.o packet.o byte_converter.o timestamp.o
 
 # Handles "$ make" and "$ make all"
 all: $(BIN_PHASE1) $(BIN_PHASE2)
@@ -33,7 +34,7 @@ $(BIN_PHASE2): main.c $(OBJ)
 
 # Removes the executable file, object files and log file
 clean:
-	rm -f $(EXE) $(OBJ) $(LOG)
+	rm -f $(BIN_PHASE1) $(BIN_PHASE2) $(OBJ) $(LOG)
 
 # "clean" and "all" don't actually create files called "clean" and "all"
 # and are therefore "Phony Targets"
