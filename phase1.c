@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
     // create a new packet
     packet_t *packet = new_packet(STDIN_FILENO);
 
-    display_output(packet);
+    update_log(packet);
 
     // we are done with the packet
     free_packet(packet);

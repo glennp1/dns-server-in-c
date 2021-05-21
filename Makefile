@@ -14,8 +14,8 @@ BIN_PHASE1 = phase1
 BIN_PHASE2 = dns_svr
 LOG = dns_svr.log
 
-OBJ = input_handler.o output_handler.o packet.o byte_converter.o timestamp.o \
-server.o
+OBJ = input_handler.o log_handler.o packet.o byte_converter.o timestamp.o \
+server.o upstream_connection.o client_connection.o
 
 # Handles "$ make" and "$ make all"
 all: $(BIN_PHASE1) $(BIN_PHASE2)
