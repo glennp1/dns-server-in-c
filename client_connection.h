@@ -20,9 +20,6 @@
 void setup_client_connection(server_t *server);
 
 // starts listening on the client socket, this can only be terminated via the console
-void start_client_connection(server_t *server);
-
-// accept and respond to any connections on the client socket
-void respond_client_connection(server_t *server);
+void listen_client_connection(server_t *server);
 
 #endif //CLIENT_CONNECTION_H
