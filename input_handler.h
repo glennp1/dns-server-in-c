@@ -16,9 +16,9 @@
 
 // --- Function Prototypes ---
 
-// Reads in the specified number of bytes from the specified input file
-// and stores them within a newly created array of bytes
-// then returns a pointer to this array
-byte_t *read_in_bytes(int input_file, int num_bytes);
+// Reads from specified input file one byte at a time,
+// does so until the num bytes has been read,
+// the bytes are stored in the array of bytes specified
+void read_byte_by_byte(int input_file, byte_t *bytes, int num_bytes);
 
 #endif //INPUT_HANDLER_H

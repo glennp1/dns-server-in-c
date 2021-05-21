@@ -5,10 +5,7 @@
 // --- System Libraries ---
 #include <stdlib.h> // for malloc
 #include <arpa/inet.h> // for inet_ntop and inet_pton
-#include <unistd.h> // for read
-
-// todo remove
-#include <stdio.h>
+#include <stdio.h> // for printing the packet
 
 // --- Project Libraries ---
 #include "packet.h"
@@ -162,9 +159,8 @@ void extract_length_and_bytes(packet_t *packet, int input_file) {
     // allocate memory to store the bytes within the packet
     packet->bytes = malloc(PACKET_LENGTH_SIZE * sizeof(byte_t));
 
-    // todo read everything byte by byte
     // read in the bytes that store the length of the remaining packet
-    read(input_file, packet->bytes, PACKET_LENGTH_SIZE);
+    read_byte_by_byte(input_file, packet->bytes, PACKET_LENGTH_SIZE);
 
     // convert these two bytes into an integer to store the packet length
     remaining_packet_length = two_bytes_to_integer(packet->bytes, 0);
@@ -177,7 +173,7 @@ void extract_length_and_bytes(packet_t *packet, int input_file) {
 
     // read in the remaining packet, starting from the end
     // of the packet length bytes
-    read(input_file, packet->bytes + PACKET_LENGTH_SIZE, remaining_packet_length);
+    read_byte_by_byte(input_file, packet->bytes + PACKET_LENGTH_SIZE, remaining_packet_length);
 }
 
 // extracts if the packet is a response or a request

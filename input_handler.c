@@ -25,21 +25,25 @@
 
 // --- Function Implementations ---
 
-// todo currently not used
-// Reads in the specified number of bytes from the specified input file
-// and stores them within a newly created array of bytes
-// then returns a pointer to this array
-byte_t *read_in_bytes(int input_file, int num_bytes) {
+// Reads from specified input file one byte at a time,
+// does so until the num bytes has been read,
+// the bytes are stored in the array of bytes specified
+void read_byte_by_byte(int input_file, byte_t *bytes, int num_bytes) {
 
-    // to store the array of bytes
-    byte_t *bytes = malloc(num_bytes * sizeof(byte_t));
+    // to keep track of how many bytes have been read successfully
+    int total_bytes_read = 0;
+    int num_bytes_read;
 
-    // read in the bytes and store them in the bytes array
-    for (int i = 0; i < num_bytes; i++) {
-        read(input_file, (bytes + i), ONE_BYTE);
+    // continue to read until the total bytes read equals the number of bytes
+    while(total_bytes_read != num_bytes) {
+
+        // read from the input file and store it,
+        // updating num_bytes_read in the process
+        num_bytes_read = read(input_file, (bytes + total_bytes_read), ONE_BYTE);
+
+        // then increase the total bytes read
+        total_bytes_read += num_bytes_read;
     }
-
-    return bytes;
 }
 
 // --- Helper Function Implementations ---
