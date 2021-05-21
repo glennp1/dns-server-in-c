@@ -168,6 +168,7 @@ void extract_length_and_bytes(packet_t *packet, int input_file) {
     // allocate memory to store the bytes within the packet
     packet->bytes = malloc(PACKET_LENGTH_SIZE * sizeof(byte_t));
 
+    // todo read everything byte by byte
     // read in the bytes that store the length of the remaining packet
     read(input_file, packet->bytes, PACKET_LENGTH_SIZE);
 
@@ -183,10 +184,6 @@ void extract_length_and_bytes(packet_t *packet, int input_file) {
     // read in the remaining packet, starting from the end
     // of the packet length bytes
     read(input_file, packet->bytes + PACKET_LENGTH_SIZE, remaining_packet_length);
-
-    // todo remove
-    printf("packet length: %d\n", packet->length);
-    print_packet_bytes(packet);
 }
 
 // extracts if the packet is a response or a request

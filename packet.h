@@ -41,4 +41,7 @@ void change_packet_rcode(packet_t *packet);
 // frees the specified packet and all of its associated memory
 void free_packet(packet_t *packet);
 
+// prints the bytes in the packet, this is used for debugging
+void print_packet_bytes(packet_t *packet);
+
 #endif //PACKET_H
