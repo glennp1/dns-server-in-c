@@ -113,9 +113,6 @@ packet_t *new_packet(int input_file) {
 // changes the packet rcode to 4 - unimplemented request
 void change_packet_rcode(packet_t *packet) {
 
-    // todo remove
-    printf("%02x\n", packet->bytes[PACKET_RCODE_INDEX]);
-
     // we want the rcode to be 4
     // the rcode is the last four bits of the byte
     // in binary that is "~~~~0100"
@@ -137,9 +134,6 @@ void change_packet_rcode(packet_t *packet) {
     // change 8th to 0
     packet->bytes[PACKET_RCODE_INDEX] = change_bit_in_byte_to_zero(
             packet->bytes[PACKET_RCODE_INDEX], EIGHT_BIT);
-
-
-    printf("%02x\n", packet->bytes[PACKET_RCODE_INDEX]);
 }
 
 // frees the specified packet and all of its associated memory
@@ -333,7 +327,6 @@ void extract_ip_address(packet_t *packet) {
     // ip address string must be the of an appropriate size
     packet->ip_address = malloc(INET6_ADDRSTRLEN * sizeof(char));
 
-    // todo not sure if this needs to handle ipv4 addresses as well?
     // convert the ip address in bytes into a string and store it in
     // packet->ip_address
     inet_ntop(AF_INET6, &ip_address_bytes, packet->ip_address, INET6_ADDRSTRLEN);
