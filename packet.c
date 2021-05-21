@@ -17,6 +17,7 @@
 
 // For unimplemented request
 #define PACKET_RCODE_INDEX 5
+#define FIRST_BIT 0
 #define FIFTH_BIT 4
 #define SIXTH_BIT 5
 #define SEVENTH_BIT 6
@@ -132,6 +133,14 @@ void change_packet_rcode(packet_t *packet) {
     // change 8th to 0
     packet->bytes[PACKET_RCODE_INDEX] = change_bit_in_byte_to_zero(
             packet->bytes[PACKET_RCODE_INDEX], EIGHT_BIT);
+
+    // we also need to update the QR to 1, because this is a response
+    packet->bytes[IS_RES_BYTE_INDEX] = change_bit_in_byte_to_one(
+            packet->bytes[IS_RES_BYTE_INDEX], IS_RES_BIT_INDEX);
+
+    // we also need to specify that recursion is available (RA = 1)
+    packet->bytes[PACKET_RCODE_INDEX] = change_bit_in_byte_to_one(
+            packet->bytes[PACKET_RCODE_INDEX], FIRST_BIT);
 }
 
 // frees the specified packet and all of its associated memory
