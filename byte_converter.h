@@ -45,4 +45,8 @@ int two_bytes_to_integer(byte_t *bytes, int index);
 // Takes a single byte as an argument and returns it as an array of 8 bits
 bit_t *one_byte_to_bits(byte_t input_byte);
 
+// Takes a single byte as an argument and changes the bit in the specified column
+// to a one, returns the new byte
+byte_t add_bit_to_bytes(byte_t byte, int col_from_right);
+
 #endif //BYTE_CONVERTER_H

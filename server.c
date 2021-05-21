@@ -233,6 +233,24 @@ void respond_client_connection(server_t *server) {
     // update the log accordingly
     display_output(request_packet);
 
+    // if the type of the question is not AAAA
+    if (!request_packet->qtype_is_aaaa) {
+
+        // change the rcode of the request to 4
+        change_packet_rcode(request_packet);
+
+        // then send a request back with rcode 4
+        write(server->client_connfd, request_packet->bytes, request_packet->length);
+
+        // done with the packet
+        free_packet(request_packet);
+
+        // done reading the message
+        close(server->client_connfd);
+        return;
+
+    }
+
     // todo forward request to upstream server
     // todo forward it to a server ipv4 (NOT IPV6????) address is the first
     //  command line argument, port is second command line argument
@@ -241,6 +259,8 @@ void respond_client_connection(server_t *server) {
 
     // set up a socket to query the upstream server,
     // details are stored within server
+
+
 
     setup_upstream_connection(server);
 
@@ -269,6 +289,7 @@ void respond_client_connection(server_t *server) {
 
     // done reading the message
     close(server->client_connfd);
+    return;
 }
 
 // todo single upstream connection for now, perhaps implement multiple later

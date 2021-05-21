@@ -90,4 +90,10 @@ bit_t *one_byte_to_bits(byte_t input_byte) {
     return bits;
 }
 
+// Takes a single byte as an argument and changes the bit in the specified column
+// to a one, returns the new byte
+byte_t add_bit_to_bytes(byte_t byte, int col_from_right) {
+    return SINGLE_BIT << (col_from_right) | byte;
+}
+
 // --- Helper Function Implementations ---

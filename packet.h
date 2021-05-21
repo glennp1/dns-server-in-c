@@ -35,6 +35,9 @@ struct packet_s {
 // creates and returns a new packet based on the specified input
 packet_t *new_packet(int input_file);
 
+// changes the packet rcode to 4 - unimplemented request
+void change_packet_rcode(packet_t *packet);
+
 // frees the specified packet and all of its associated memory
 void free_packet(packet_t *packet);
 

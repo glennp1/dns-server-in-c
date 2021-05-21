@@ -16,6 +16,10 @@
 
 // --- Constant Definitions ---
 
+// For unimplemented request
+#define PACKET_RCODE_INDEX 5
+#define PACKET_RCODE_BIT_COL_FROM_RIGHT 2
+
 // The number of bytes that stores the packet length
 #define PACKET_LENGTH_SIZE 2
 
@@ -100,6 +104,18 @@ packet_t *new_packet(int input_file) {
     }
 
     return packet;
+}
+
+// changes the packet rcode to 4 - unimplemented request
+void change_packet_rcode(packet_t *packet) {
+
+    // todo remove
+    printf("%02x\n", packet->bytes[PACKET_RCODE_INDEX]);
+
+    packet->bytes[PACKET_RCODE_INDEX] = add_bit_to_bytes(packet->bytes[PACKET_RCODE_INDEX],
+                                                         PACKET_RCODE_BIT_COL_FROM_RIGHT);
+
+    printf("%02x\n", packet->bytes[PACKET_RCODE_INDEX]);
 }
 
 // frees the specified packet and all of its associated memory
