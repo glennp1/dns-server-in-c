@@ -2,8 +2,8 @@
 // Created by Glenn Phillips on 17/5/21.
 //
 
-#ifndef OUTPUT_HANDLER_H
-#define OUTPUT_HANDLER_H
+#ifndef LOG_HANDLER_H
+#define LOG_HANDLER_H
 
 // --- System Libraries ---
 
@@ -15,6 +15,6 @@
 // --- Type Definitions ---
 
 // --- Function Prototypes ---
-void display_output(packet_t *packet);
+void update_log(packet_t *packet);
 
-#endif //OUTPUT_HANDLER_H
+#endif //LOG_HANDLER_H

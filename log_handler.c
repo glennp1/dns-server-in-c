@@ -15,15 +15,11 @@
 #include <stdlib.h>
 
 // --- Project Libraries ---
-#include "output_handler.h"
+#include "log_handler.h"
 #include "byte_converter.h"
 #include "timestamp.h"
 
 // --- Constant Definitions ---
-
-
-// todo might not be required
-#define IN_QCLASS 1 // for qclass
 
 // --- Type Definitions ---
 
@@ -31,7 +27,7 @@
 
 // --- Function Implementations ---
 
-void display_output(packet_t *packet) {
+void update_log(packet_t *packet) {
 
     char *timestamp = get_timestamp();
 
@@ -68,8 +64,6 @@ void display_output(packet_t *packet) {
         }
     }
 
-
-    // todo not sure if this is necessary
     // to ensure that log updates are timely, as specified in the spec
     fflush(file);
 
