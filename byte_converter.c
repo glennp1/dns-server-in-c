@@ -22,31 +22,6 @@
 
 // --- Function Implementations ---
 
-// Returns a pointer to a new array of bytes
-byte_array_t *new_byte_array(int size) {
-
-    // initialise the array
-    byte_array_t *byte_array = malloc(sizeof(byte_array_t));
-
-    // initialise the size and bytes
-    byte_array->size = size;
-    byte_array->bytes = malloc(size * sizeof(byte_t));
-
-    return byte_array;
-}
-
-// Frees the specified array of bytes and all of its associated memory
-void free_byte_array(byte_array_t *byte_array) {
-
-    // size does not need to be freed
-
-    // free the bytes
-    free(byte_array->bytes);
-
-    // free the byte array itself
-    free(byte_array);
-}
-
 // Takes a byte array and an index as arguments
 // Then takes the two bytes indicated by the index
 // and returns them as a single integer

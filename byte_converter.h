@@ -21,21 +21,7 @@ typedef unsigned char byte_t;
 // represents one bit
 typedef unsigned char bit_t;
 
-// represents an array of bytes
-typedef struct byte_array_s byte_array_t;
-
-struct byte_array_s {
-    int size;
-    byte_t *bytes;
-};
-
 // --- Function Prototypes ---
-
-// Returns a pointer to a new array of bytes
-byte_array_t *new_byte_array();
-
-// Frees the specified array of bytes and all of its associated memory
-void free_byte_array(byte_array_t *byte_array);
 
 // Takes a byte array and an index as arguments
 // Then takes the two bytes indicated by the index
