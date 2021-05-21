@@ -1,15 +1,10 @@
 //
 // Created by Glenn Phillips on 17/5/21.
 //
-// todo
-//  read in a packet from std in
-//  parse the packet
 
 // --- System Libraries ---
 #include <unistd.h> // for read
 #include <stdlib.h> // for malloc
-
-// todo remove
 #include <stdio.h>
 
 // --- Project Libraries ---

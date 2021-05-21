@@ -21,11 +21,13 @@
 
 // --- Function Implementations ---
 
+// main function, parses in a new packet and updates the log
 int main(int argc, char *argv[]) {
 
-    // create a new packet
+    // create and parse a new packet based on input
     packet_t *packet = new_packet(STDIN_FILENO);
 
+    // update the log of the packet
     update_log(packet);
 
     // we are done with the packet

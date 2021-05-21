@@ -3,11 +3,13 @@
 //
 
 // --- System Libraries ---
+
 #include <stdlib.h> // for malloc
 #include <arpa/inet.h> // for inet_ntop and inet_pton
 #include <stdio.h> // for printing the packet
 
 // --- Project Libraries ---
+
 #include "packet.h"
 #include "input_handler.h"
 
@@ -19,7 +21,6 @@
 #define SIXTH_BIT 5
 #define SEVENTH_BIT 6
 #define EIGHT_BIT 7
-
 
 // The number of bytes that stores the packet length
 #define PACKET_LENGTH_SIZE 2
@@ -184,7 +185,6 @@ void extract_is_response(packet_t *packet) {
     // store if response or request
     packet->is_response = bits[IS_RES_BIT_INDEX];
 
-    // todo change this to separate function
     // done with bits
     free(bits);
 }

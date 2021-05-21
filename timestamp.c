@@ -5,8 +5,6 @@
 // --- System Libraries ---
 #include <time.h> // for strftime, time etc.
 #include <stdlib.h> // for malloc
-
-// todo remove
 #include <stdio.h>
 
 // --- Project Libraries ---
@@ -50,9 +48,6 @@ char *get_timestamp() {
 
         // allocate memory to the time stamp and try again
         timestamp = malloc(time_size);
-
-        // todo remove
-        // printf("new size: %d\n", time_size);
     }
 
     // return the formatted timestamp

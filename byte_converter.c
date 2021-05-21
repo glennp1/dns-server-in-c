@@ -7,6 +7,7 @@
 #include <stdlib.h> // for malloc
 
 // --- Project Libraries ---
+
 #include "byte_converter.h"
 
 // --- Constant Definitions ---

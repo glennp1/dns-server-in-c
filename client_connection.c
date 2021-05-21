@@ -16,6 +16,7 @@
 #include <sys/wait.h>
 
 // --- Project Libraries ---
+
 #include "client_connection.h"
 #include "packet.h"
 #include "log_handler.h"
@@ -26,7 +27,6 @@
 
 #define CLIENT_PORT "8053"
 
-// todo follow up?
 // maximum number of connections is 100, as per the specification sheet
 #define BACKLOG 100
 

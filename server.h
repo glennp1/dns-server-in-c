@@ -15,7 +15,6 @@
 
 typedef struct server_s server_t;
 
-// todo change the datatype to be more convenient
 struct server_s {
     char *upstream_server_ip;
     char *upstream_server_port;
@@ -31,5 +30,8 @@ server_t *setup_server(int argc, char *argv[]);
 
 // starts the specified server, this can only be terminated via the console
 void start_server(server_t *server);
+
+// frees the server and its associated data
+void free_server(server_t *server);
 
 #endif //SERVER_H

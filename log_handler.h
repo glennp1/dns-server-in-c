@@ -15,6 +15,8 @@
 // --- Type Definitions ---
 
 // --- Function Prototypes ---
+
+// updates the log based on the specified packet
 void update_log(packet_t *packet);
 
 #endif //LOG_HANDLER_H
