@@ -18,7 +18,11 @@
 
 // For unimplemented request
 #define PACKET_RCODE_INDEX 5
-#define PACKET_RCODE_BIT_COL_FROM_RIGHT 2
+#define FIFTH_BIT 4
+#define SIXTH_BIT 5
+#define SEVENTH_BIT 6
+#define EIGHT_BIT 7
+
 
 // The number of bytes that stores the packet length
 #define PACKET_LENGTH_SIZE 2
@@ -112,8 +116,28 @@ void change_packet_rcode(packet_t *packet) {
     // todo remove
     printf("%02x\n", packet->bytes[PACKET_RCODE_INDEX]);
 
-    packet->bytes[PACKET_RCODE_INDEX] = add_bit_to_bytes(packet->bytes[PACKET_RCODE_INDEX],
-                                                         PACKET_RCODE_BIT_COL_FROM_RIGHT);
+    // we want the rcode to be 4
+    // the rcode is the last four bits of the byte
+    // in binary that is "~~~~0100"
+    // so we need to update the 5th, 6th, 7th and 8th bit
+
+    // change 5th to 0
+    packet->bytes[PACKET_RCODE_INDEX] = change_bit_in_byte_to_zero(
+            packet->bytes[PACKET_RCODE_INDEX], FIFTH_BIT);
+
+    // change 6th to 1
+    packet->bytes[PACKET_RCODE_INDEX] = change_bit_in_byte_to_one(
+            packet->bytes[PACKET_RCODE_INDEX], SIXTH_BIT);
+
+    // change 7th to 0
+    packet->bytes[PACKET_RCODE_INDEX] = change_bit_in_byte_to_zero(
+            packet->bytes[PACKET_RCODE_INDEX], SEVENTH_BIT);
+
+
+    // change 8th to 0
+    packet->bytes[PACKET_RCODE_INDEX] = change_bit_in_byte_to_zero(
+            packet->bytes[PACKET_RCODE_INDEX], EIGHT_BIT);
+
 
     printf("%02x\n", packet->bytes[PACKET_RCODE_INDEX]);
 }

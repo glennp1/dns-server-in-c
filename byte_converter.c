@@ -13,7 +13,7 @@
 
 #define EIGHT_BIT_SHIFT 8
 
-#define SINGLE_BIT 1
+#define ONE_BIT 1
 #define MAX_SHIFT_LEFT 7
 
 // --- Type Definitions ---
@@ -67,7 +67,7 @@ bit_t *one_byte_to_bits(byte_t input_byte) {
         // this is done by shifting a single bit left from the
         // last column (0000 0001) to the appropriate column,
         // at most 7 spaces across (1000 0000)
-        bit_mask = SINGLE_BIT << (MAX_SHIFT_LEFT-i);
+        bit_mask = ONE_BIT << (MAX_SHIFT_LEFT-i);
 
         // check if any of the bits within the input byte match with the bit mask
         // if one bit does match then store a 1, otherwise store a 0
@@ -90,10 +90,34 @@ bit_t *one_byte_to_bits(byte_t input_byte) {
     return bits;
 }
 
-// Takes a single byte as an argument and changes the bit in the specified column
+// Takes a single byte as an argument and changes the bit in the specified index
 // to a one, returns the new byte
-byte_t add_bit_to_bytes(byte_t byte, int col_from_right) {
-    return SINGLE_BIT << (col_from_right) | byte;
+byte_t change_bit_in_byte_to_one(byte_t byte, int bit_index) {
+
+    // calculate the column from the right
+    int col_from_right = MAX_SHIFT_LEFT - bit_index;
+
+    // to store the mask,
+    // will look something like this "0000 0100"
+    byte_t bit_mask = ONE_BIT << (col_from_right);
+
+    // change the bit to a one
+    return bit_mask | byte;
+}
+
+// Takes a single byte as an argument and changes the bit in the specified index
+// to a zero, returns the new byte
+byte_t change_bit_in_byte_to_zero(byte_t byte, int bit_index) {
+
+    // calculate the column from the right
+    int col_from_right = MAX_SHIFT_LEFT - bit_index;
+
+    // to store the mask, note that it is inverted
+    // will look something like this "1111 1011"
+    byte_t bit_mask = ~(ONE_BIT << (col_from_right));
+
+    // change the bit to a zero
+    return bit_mask & byte;
 }
 
 // --- Helper Function Implementations ---
