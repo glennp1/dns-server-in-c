@@ -63,24 +63,24 @@ server_t *setup_server(int argc, char *argv[]) {
 void start_server(server_t *server) {
 
     // todo for upstream and client
-//    // set up a socket to respond to client requests,
-//    // details are stored within server
-//    setup_client_connection(server);
-//
-//    // start listening on the client socket
-//    listen_client_connection(server);
+    // set up a socket to respond to client requests,
+    // details are stored within server
+    setup_client_connection(server);
+
+    // start listening on the client socket
+    listen_client_connection(server);
 
 
     // todo for upstream only
-    packet_t *request_packet = new_packet(STDIN_FILENO);
-    print_packet_bytes(request_packet);
-    update_log(request_packet);
-
-    setup_upstream_connection(server);
-    packet_t *response_packet = send_req_to_upstream(server, request_packet);
-    printf("\nresponse:\n");
-    print_packet_bytes(response_packet);
-    update_log(response_packet);
+//    packet_t *request_packet = new_packet(STDIN_FILENO);
+//    print_packet_bytes(request_packet);
+//    update_log(request_packet);
+//
+//    setup_upstream_connection(server);
+//    packet_t *response_packet = send_req_to_upstream(server, request_packet);
+//    printf("\nresponse:\n");
+//    print_packet_bytes(response_packet);
+//    update_log(response_packet);
 
 
 
