@@ -1,17 +1,11 @@
 //
 // Created by Glenn Phillips on 17/5/21.
 //
-// todo
-//  output the log entry to the file ./dns_svr.log
 
 // --- System Libraries ---
 #include <stdio.h> // for output
 #include <stdbool.h> // for booleans
-
-
 #include <string.h> // for strcat
-
-// todo remove
 #include <stdlib.h>
 
 // --- Project Libraries ---
@@ -27,6 +21,7 @@
 
 // --- Function Implementations ---
 
+// updates the log based on the specified packet
 void update_log(packet_t *packet) {
 
     char *timestamp = get_timestamp();
@@ -34,9 +29,6 @@ void update_log(packet_t *packet) {
     FILE *file;
 
     file = fopen("dns_svr.log", "a");
-
-    // todo not sure if this should be at the start
-    // qtype aaaa?????
 
     // if the packet is a response
     if (packet->is_response) {
